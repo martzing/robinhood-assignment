@@ -1,0 +1,21 @@
+package helpers
+
+type CustomError struct {
+	StatusCode int
+	Message    string
+}
+
+func NewCustomError(code int, message string) error {
+	return CustomError{
+		StatusCode: code,
+		Message:    message,
+	}
+}
+
+func (e CustomError) Error() string {
+	return e.Message
+}
+
+func (e CustomError) Code() int {
+	return e.StatusCode
+}
