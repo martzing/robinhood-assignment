@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+type BaseResponse struct {
+	StatusCode int    `json:"statusCode"`
+	Message    string `json:"message"`
+}
+
 type Pagination struct {
 	Page    uint64 `json:"page"`
 	Size    uint64 `json:"size"`
@@ -52,21 +57,11 @@ type AddInterviewCommentRequest struct {
 	UserID  string `json:"userId" from:"userId" valid:"type(string)"`
 }
 
-type AddInterviewCommentResponse struct {
-	StatusCode int    `json:"statusCode"`
-	Message    string `json:"message"`
-}
-
 type UpdateInterviewAppointmentRequest struct {
 	ID          string `json:"id" from:"id" valid:"type(string)"`
 	Title       string `json:"title" from:"title" valid:"type(string),optional"`
 	Description string `json:"description" from:"description" valid:"type(string),optional"`
 	Status      string `json:"status" from:"status" valid:"type(string),in(TODO|IN_PROGRESS|DONE),optional"`
-}
-
-type UpdateInterviewAppointmentResponse struct {
-	StatusCode int    `json:"statusCode"`
-	Message    string `json:"message"`
 }
 
 type InterviewAppointmentDetail struct {

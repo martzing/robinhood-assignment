@@ -18,6 +18,6 @@ type InterviewAppointmentRepository interface {
 	Get(ctx context.Context, id primitive.ObjectID) (*domains.InterviewAppointment, error)
 	Create(ctx context.Context, params *domains.CreateInterviewAppointmentParams) (*domains.CreateInterviewAppointment, error)
 	Update(ctx context.Context, params *domains.UpdateInterviewAppointmentParams) (*domains.InterviewAppointment, error)
-	// Delete(ctx context.Context, id string) error
+	ArchiveInterviewAppointment(ctx context.Context, id primitive.ObjectID) error
 	AddComment(ctx context.Context, params *domains.AddInterviewCommentParams) error
 }

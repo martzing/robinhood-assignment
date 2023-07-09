@@ -160,7 +160,26 @@ func (h *interviewHandler) UpdateInterviewAppointment(ctx *gin.Context) {
 		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
 		return
 	}
-	response := dto.UpdateInterviewAppointmentResponse{
+	response := dto.BaseResponse{
+		StatusCode: http.StatusOK,
+		Message:    "success",
+	}
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (h *interviewHandler) ArchiveInterviewAppointment(ctx *gin.Context) {
+	id, err := h.interviewValidate.ValidateGetInterviewAppointment(ctx)
+	if err != nil {
+		errRes := helpers.ErrorHandler(err)
+		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
+		return
+	}
+	if err := h.interviewService.ArchiveInterviewAppointment(ctx, id); err != nil {
+		errRes := helpers.ErrorHandler(err)
+		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
+		return
+	}
+	response := dto.BaseResponse{
 		StatusCode: http.StatusOK,
 		Message:    "success",
 	}
@@ -185,7 +204,7 @@ func (h *interviewHandler) AddInterviewComment(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, dto.AddInterviewCommentResponse{
+	ctx.JSON(http.StatusOK, dto.BaseResponse{
 		StatusCode: http.StatusOK,
 		Message:    "success",
 	})

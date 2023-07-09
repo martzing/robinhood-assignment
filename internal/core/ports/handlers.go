@@ -14,6 +14,6 @@ type InterviewHandler interface {
 	GetInterviewAppointment(ctx *gin.Context)
 	CreateInterviewAppointment(ctx *gin.Context)
 	UpdateInterviewAppointment(ctx *gin.Context)
-	// ArchiveInterviewAppointment(ctx *gin.Context)
+	ArchiveInterviewAppointment(ctx *gin.Context)
 	AddInterviewComment(ctx *gin.Context)
 }

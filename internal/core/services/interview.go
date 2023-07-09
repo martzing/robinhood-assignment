@@ -82,6 +82,20 @@ func (s *interviewService) UpdateInterviewAppointment(ctx context.Context, req *
 	return nil
 }
 
+func (s *interviewService) ArchiveInterviewAppointment(ctx context.Context, id string) error {
+	objId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return helpers.InternalError
+	}
+	if err := s.interviewAppointmentRepo.ArchiveInterviewAppointment(ctx, objId); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return helpers.NewCustomError(http.StatusNotFound, "Interview appointment not found or archived")
+		}
+		return helpers.InternalError
+	}
+	return nil
+}
+
 func (s *interviewService) AddInterviewComment(ctx context.Context, req *dto.AddInterviewCommentRequest) error {
 	id, err := primitive.ObjectIDFromHex(req.ID)
 	if err != nil {

@@ -164,6 +164,17 @@ func (r *interviewAppointmentRepository) Update(ctx context.Context, params *dom
 	return &res, nil
 }
 
+func (r *interviewAppointmentRepository) ArchiveInterviewAppointment(ctx context.Context, id primitive.ObjectID) error {
+	filter := bson.D{{Key: "_id", Value: id}, {Key: "isArchived", Value: false}}
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "isArchived", Value: true}}}}
+	opts := &options.FindOneAndUpdateOptions{}
+	opts.SetUpsert(false)
+	if err := r.col.FindOneAndUpdate(ctx, filter, update, opts).Err(); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *interviewAppointmentRepository) AddComment(ctx context.Context, params *domains.AddInterviewCommentParams) error {
 	now := time.Now()
 	filter := bson.D{{Key: "_id", Value: params.ID}, {Key: "isArchived", Value: false}}

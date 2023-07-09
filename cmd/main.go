@@ -59,8 +59,9 @@ func main() {
 	r.GET("/api/interviews", inhdl.GetInterviewAppointments)
 	r.GET("/api/interviews/:id", inhdl.GetInterviewAppointment)
 	r.POST("/api/interviews", inhdl.CreateInterviewAppointment)
-	r.PATCH("/api/interviews", inhdl.UpdateInterviewAppointment)
-	r.POST("/api/interviews/comment", inhdl.AddInterviewComment)
+	r.PATCH("/api/interviews/:id", inhdl.UpdateInterviewAppointment)
+	r.PATCH("/api/interviews/:id/archive", inhdl.ArchiveInterviewAppointment)
+	r.POST("/api/interviews/:id/comment", inhdl.AddInterviewComment)
 	r.POST("/api/user", authhdl.RegisterAdmin)
 
 	srv := &http.Server{

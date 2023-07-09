@@ -73,6 +73,11 @@ func (v interviewValidate) ValidateUpdateInterviewAppointment(ctx *gin.Context) 
 	if err := ctx.BindJSON(&req); err != nil {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, "Invalid input parameter")
 	}
+	id := ctx.Param("id")
+	if id == "" {
+		return nil, helpers.NewCustomError(http.StatusBadRequest, "id: Missing required field")
+	}
+	req.ID = id
 	if req.Title == "" && req.Description == "" && req.Status == "" {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, "at least one field required")
 	}
@@ -86,12 +91,28 @@ func (v interviewValidate) ValidateUpdateInterviewAppointment(ctx *gin.Context) 
 	return &req, nil
 }
 
+func (v interviewValidate) ValidateArchiveInterviewAppointment(ctx *gin.Context) (string, error) {
+	id := ctx.Param("id")
+	if id == "" {
+		return "", helpers.NewCustomError(http.StatusBadRequest, "id: Missing required field")
+	}
+	formats := strfmt.Default
+	if err := validate.FormatOf("id", "param", "bsonobjectid", id, formats); err != nil {
+		return "", helpers.NewCustomError(http.StatusBadRequest, err.Error())
+	}
+	return id, nil
+}
+
 func (v interviewValidate) ValidateAddInterviewComment(ctx *gin.Context) (*dto.AddInterviewCommentRequest, error) {
 	req := dto.AddInterviewCommentRequest{}
 	if err := ctx.BindJSON(&req); err != nil {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, "Invalid input parameter")
 	}
-
+	id := ctx.Param("id")
+	if id == "" {
+		return nil, helpers.NewCustomError(http.StatusBadRequest, "id: Missing required field")
+	}
+	req.ID = id
 	value, exists := ctx.Get("user")
 	if !exists {
 		return nil, helpers.InternalError

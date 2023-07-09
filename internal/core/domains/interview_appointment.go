@@ -31,14 +31,14 @@ type InterviewAppointment struct {
 }
 
 type CreateInterviewAppointmentParams struct {
-	Title       string `bson:"title"`
-	Description string `bson:"description"`
+	Title       string
+	Description string
 	UserID      primitive.ObjectID
 }
 
 type UpdateInterviewAppointmentParams struct {
-	ID          primitive.ObjectID `bson:"_id"`
-	Title       string             `bson:"title"`
-	Description string             `bson:"description"`
-	Status      string             `bson:"status"`
+	ID          primitive.ObjectID
+	Title       string
+	Description string
+	Status      string
 }

@@ -16,6 +16,6 @@ type InterviewService interface {
 	GetInterviewAppointment(ctx context.Context, id string) (*domains.InterviewAppointment, error)
 	CreateInterviewAppointment(ctx context.Context, req *dto.CreateInterviewAppointmentRequest) (*domains.CreateInterviewAppointment, error)
 	UpdateInterviewAppointment(ctx context.Context, req *dto.UpdateInterviewAppointmentRequest) error
-	// ArchiveInterviewAppointment(ctx *gin.Context)
+	ArchiveInterviewAppointment(ctx context.Context, id string) error
 	AddInterviewComment(ctx context.Context, req *dto.AddInterviewCommentRequest) error
 }
