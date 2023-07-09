@@ -14,7 +14,7 @@ type AuthServie interface {
 type InterviewService interface {
 	GetInterviewAppointments(ctx context.Context, offset int64, limit int64) ([]domains.InterviewAppointment, error)
 	GetInterviewAppointment(ctx context.Context, id string) (*domains.InterviewAppointment, error)
-	CreateInterviewAppointment(ctx context.Context, req *dto.CreateInterviewAppointmentRequest) (*domains.InterviewAppointment, error)
+	CreateInterviewAppointment(ctx context.Context, req *dto.CreateInterviewAppointmentRequest) (*domains.CreateInterviewAppointment, error)
 	// UpdateInterviewAppointment(ctx *gin.Context)
 	// ArchiveInterviewAppointment(ctx *gin.Context)
 }

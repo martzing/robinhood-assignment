@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"fmt"
 	"robinhood-assignment/internal/core/domains"
 	"robinhood-assignment/internal/core/ports"
 	"time"
@@ -10,7 +9,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type interviewAppointmentRepository struct {
@@ -31,12 +29,37 @@ func NewInterviewAppointmentRepository(mc *mongo.Client, db string) ports.Interv
 }
 
 func (r *interviewAppointmentRepository) GetAll(ctx context.Context, offset int64, limit int64) ([]domains.InterviewAppointment, error) {
-	fmt.Printf("offset %#v\n", offset)
-	fmt.Printf("limit %#v\n", limit)
-	res := []domains.InterviewAppointment{}
-	opts := options.Find().SetSort(bson.D{{Key: "createdAt", Value: -1}}).SetLimit(limit).SetSkip(offset)
+	pipeline := []bson.D{
+		{
+			{
+				Key: "$lookup",
+				Value: bson.D{
+					{Key: "from", Value: "user"},
+					{Key: "localField", Value: "createUserId"},
+					{Key: "foreignField", Value: "_id"},
+					{Key: "as", Value: "createUser"},
+				},
+			},
+		},
+		{
+			{
+				Key: "$unwind",
+				Value: bson.D{
+					{Key: "path", Value: "$createUser"},
+					{Key: "preserveNullAndEmptyArrays", Value: false},
+				},
+			},
+		},
+		{
+			{Key: "$skip", Value: offset},
+		},
+		{
+			{Key: "$limit", Value: limit},
+		},
+	}
 
-	cur, err := r.col.Find(ctx, bson.D{}, opts)
+	res := []domains.InterviewAppointment{}
+	cur, err := r.col.Aggregate(ctx, pipeline)
 	if err != nil {
 		return res, err
 	}
@@ -47,20 +70,54 @@ func (r *interviewAppointmentRepository) GetAll(ctx context.Context, offset int6
 }
 
 func (r *interviewAppointmentRepository) Get(ctx context.Context, id primitive.ObjectID) (*domains.InterviewAppointment, error) {
-	filter := bson.D{{Key: "_id", Value: id}}
-	res := domains.InterviewAppointment{}
-	if err := r.col.FindOne(ctx, filter).Decode(&res); err != nil {
-		if err == mongo.ErrNoDocuments {
-			return nil, nil
-		}
+	pipeline := []bson.D{
+		{
+			{
+				Key:   "$match",
+				Value: bson.D{{Key: "_id", Value: id}},
+			},
+		},
+		{
+			{
+				Key: "$lookup",
+				Value: bson.D{
+					{Key: "from", Value: "user"},
+					{Key: "localField", Value: "createUserId"},
+					{Key: "foreignField", Value: "_id"},
+					{Key: "as", Value: "createUser"},
+				},
+			},
+		},
+		{
+			{
+				Key: "$unwind",
+				Value: bson.D{
+					{Key: "path", Value: "$createUser"},
+					{Key: "preserveNullAndEmptyArrays", Value: false},
+				},
+			},
+		},
+		{
+			{Key: "$limit", Value: 1},
+		},
+	}
+	res := []domains.InterviewAppointment{}
+	cur, err := r.col.Aggregate(ctx, pipeline)
+	if err != nil {
 		return nil, err
 	}
-	return &res, nil
+	if err := cur.All(ctx, &res); err != nil {
+		return nil, err
+	}
+	if len(res) == 0 {
+		return nil, nil
+	}
+	return &res[0], nil
 }
 
-func (r *interviewAppointmentRepository) Create(ctx context.Context, params *domains.CreateInterviewAppointmentParams) (*domains.InterviewAppointment, error) {
+func (r *interviewAppointmentRepository) Create(ctx context.Context, params *domains.CreateInterviewAppointmentParams) (*domains.CreateInterviewAppointment, error) {
 	now := time.Now()
-	interviewAppointment := domains.InterviewAppointment{
+	interviewAppointment := domains.CreateInterviewAppointment{
 		ID:           primitive.NewObjectID(),
 		Title:        params.Title,
 		Description:  params.Description,

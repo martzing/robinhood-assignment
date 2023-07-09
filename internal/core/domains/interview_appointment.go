@@ -6,7 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type InterviewAppointment struct {
+type CreateInterviewAppointment struct {
 	ID           primitive.ObjectID `bson:"_id"`
 	Title        string             `bson:"title"`
 	Description  string             `bson:"description"`
@@ -16,6 +16,18 @@ type InterviewAppointment struct {
 	CreateUserId primitive.ObjectID `bson:"createUserId"`
 	CreatedAt    time.Time          `bson:"createdAt"`
 	UpdatedAt    time.Time          `bson:"updatedAt"`
+}
+
+type InterviewAppointment struct {
+	ID          primitive.ObjectID `bson:"_id"`
+	Title       string             `bson:"title"`
+	Description string             `bson:"description"`
+	Comments    []InterviewComment `bson:"comments"`
+	Status      string             `bson:"status"`
+	IsArchived  bool               `bson:"isArchived"`
+	CreateUser  User               `bson:"createUser"`
+	CreatedAt   time.Time          `bson:"createdAt"`
+	UpdatedAt   time.Time          `bson:"updatedAt"`
 }
 
 type CreateInterviewAppointmentParams struct {

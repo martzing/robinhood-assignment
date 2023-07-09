@@ -31,16 +31,22 @@ func (s *interviewService) GetInterviewAppointments(ctx context.Context, offset 
 func (s *interviewService) GetInterviewAppointment(ctx context.Context, id string) (*domains.InterviewAppointment, error) {
 	objID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, helpers.NewCustomError(http.StatusInternalServerError, "Something went wrong please contact developer")
+		return nil, helpers.InternalError
 	}
 	data, err := s.interviewAppointmentRepo.Get(ctx, objID)
+	if err != nil {
+		return nil, helpers.InternalError
+	}
+	if data == nil {
+		return nil, helpers.NewCustomError(http.StatusNotFound, "Interview appointment not found.")
+	}
 	return data, nil
 }
 
-func (s *interviewService) CreateInterviewAppointment(ctx context.Context, req *dto.CreateInterviewAppointmentRequest) (*domains.InterviewAppointment, error) {
+func (s *interviewService) CreateInterviewAppointment(ctx context.Context, req *dto.CreateInterviewAppointmentRequest) (*domains.CreateInterviewAppointment, error) {
 	userId, err := primitive.ObjectIDFromHex(req.CreatedBy)
 	if err != nil {
-		return nil, helpers.NewCustomError(http.StatusInternalServerError, "Something went wrong please contact developer")
+		return nil, helpers.InternalError
 	}
 	params := &domains.CreateInterviewAppointmentParams{
 		Title:       req.Title,

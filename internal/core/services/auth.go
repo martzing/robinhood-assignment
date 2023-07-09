@@ -27,10 +27,7 @@ func NewAuthService(userRepo ports.UserRepository, myBcrypt ports.MyBcrypt, myJW
 func (a *authService) RegisterAdmin(ctx context.Context, req *dto.RegisterAdminRequest) (*dto.RegisterAdminResponse, error) {
 	user, err := a.userRepo.GetByUsername(ctx, req.Username)
 	if err != nil {
-		return nil, helpers.CustomError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Something went wrong, please contact developer",
-		}
+		return nil, helpers.InternalError
 	}
 	if user != nil {
 		return nil, helpers.CustomError{
@@ -40,10 +37,7 @@ func (a *authService) RegisterAdmin(ctx context.Context, req *dto.RegisterAdminR
 	}
 	passHash, err := a.myBcrypt.GenerateFromPassword(req.Password, config.Get().Auth.BcryptCost)
 	if err != nil {
-		return nil, helpers.CustomError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Something went wrong, please contact developer",
-		}
+		return nil, helpers.InternalError
 	}
 
 	createUserPatams := &domains.CreateUserParams{
@@ -70,10 +64,7 @@ func (a *authService) RegisterAdmin(ctx context.Context, req *dto.RegisterAdminR
 func (a *authService) Login(ctx context.Context, params *dto.LoginRequest) (*dto.LoginResponse, error) {
 	user, err := a.userRepo.GetByUsername(ctx, params.Username)
 	if err != nil {
-		return nil, helpers.CustomError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Something went wrong, please contact developer",
-		}
+		return nil, helpers.InternalError
 	}
 	if user == nil {
 		return nil, helpers.CustomError{
@@ -96,10 +87,7 @@ func (a *authService) Login(ctx context.Context, params *dto.LoginRequest) (*dto
 	})
 	tokenString, err := token.SignedString([]byte(config.Get().Auth.JwtSecret))
 	if err != nil {
-		return nil, helpers.CustomError{
-			StatusCode: http.StatusInternalServerError,
-			Message:    "Something went wrong, please contact developer",
-		}
+		return nil, helpers.InternalError
 	}
 	return &dto.LoginResponse{
 		StatusCode: http.StatusOK,

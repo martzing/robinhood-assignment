@@ -50,8 +50,12 @@ func (h *interviewHandler) GetInterviewAppointments(ctx *gin.Context) {
 			Title:       data[i].Title,
 			Description: data[i].Description,
 			Status:      data[i].Status,
-			CreateUser:  dto.User{},
-			CreatedAt:   data[i].CreatedAt,
+			CreateUser: dto.User{
+				Name:     data[i].CreateUser.Name,
+				Email:    data[i].CreateUser.Email,
+				ImageUrl: data[i].CreateUser.ImageUrl,
+			},
+			CreatedAt: data[i].CreatedAt,
 		}
 	}
 	size, hasNext := helpers.Paginate(&interviews, int64(req.Limit))
@@ -96,9 +100,13 @@ func (h *interviewHandler) GetInterviewAppointment(ctx *gin.Context) {
 			Title:       data.Title,
 			Description: data.Description,
 			Status:      data.Status,
-			CreateUser:  dto.User{},
-			CreatedAt:   data.CreatedAt,
-			Comments:    []dto.InterviewComment{},
+			CreateUser: dto.User{
+				Name:     data.CreateUser.Name,
+				Email:    data.CreateUser.Email,
+				ImageUrl: data.CreateUser.ImageUrl,
+			},
+			CreatedAt: data.CreatedAt,
+			Comments:  comments,
 		},
 	}
 

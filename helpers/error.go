@@ -1,5 +1,7 @@
 package helpers
 
+import "net/http"
+
 type CustomError struct {
 	StatusCode int
 	Message    string
@@ -19,3 +21,5 @@ func (e CustomError) Error() string {
 func (e CustomError) Code() int {
 	return e.StatusCode
 }
+
+var InternalError = NewCustomError(http.StatusInternalServerError, "Something went wrong please contact developer.")
