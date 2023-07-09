@@ -40,7 +40,7 @@ func main() {
 	interviewRepo := repositories.NewInterviewAppointmentRepository(mc, config.Get().Mongo.Database)
 	userRepo := repositories.NewUserRepository(mc, config.Get().Mongo.Database)
 
-	interviewService := services.NewInterviewService(interviewRepo)
+	interviewService := services.NewInterviewService(interviewRepo, userRepo)
 	authService := services.NewAuthService(userRepo, myBcrypt, myJWT)
 
 	interviewValidate := validate.NewInterviewValidate()

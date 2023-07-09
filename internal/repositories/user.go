@@ -27,12 +27,8 @@ func NewUserRepository(mc *mongo.Client, db string) ports.UserRepository {
 	}
 }
 
-func (u *user) Get(ctx context.Context, id string) (*domains.User, error) {
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, err
-	}
-	filter := bson.D{{Key: "_id", Value: objID}}
+func (u *user) Get(ctx context.Context, id primitive.ObjectID) (*domains.User, error) {
+	filter := bson.D{{Key: "_id", Value: id}}
 	res := domains.User{}
 	if err := u.col.FindOne(ctx, filter).Decode(&res); err != nil {
 		if err == mongo.ErrNoDocuments {

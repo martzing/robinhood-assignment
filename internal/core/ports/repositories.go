@@ -8,7 +8,7 @@ import (
 )
 
 type UserRepository interface {
-	Get(ctx context.Context, id string) (*domains.User, error)
+	Get(ctx context.Context, id primitive.ObjectID) (*domains.User, error)
 	GetByUsername(ctx context.Context, username string) (*domains.User, error)
 	Create(ctx context.Context, params *domains.CreateUserParams) (*domains.User, error)
 }

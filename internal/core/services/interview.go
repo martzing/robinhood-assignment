@@ -14,11 +14,13 @@ import (
 
 type interviewService struct {
 	interviewAppointmentRepo ports.InterviewAppointmentRepository
+	userRepo                 ports.UserRepository
 }
 
-func NewInterviewService(interviewAppointmentRepo ports.InterviewAppointmentRepository) ports.InterviewService {
+func NewInterviewService(interviewAppointmentRepo ports.InterviewAppointmentRepository, userRepo ports.UserRepository) ports.InterviewService {
 	return &interviewService{
 		interviewAppointmentRepo: interviewAppointmentRepo,
+		userRepo:                 userRepo,
 	}
 }
 
@@ -44,10 +46,17 @@ func (s *interviewService) GetInterviewAppointment(ctx context.Context, id strin
 	return data, nil
 }
 
-func (s *interviewService) CreateInterviewAppointment(ctx context.Context, req *dto.CreateInterviewAppointmentRequest) (*domains.CreateInterviewAppointment, error) {
+func (s *interviewService) CreateInterviewAppointment(ctx context.Context, req *dto.CreateInterviewAppointmentRequest) (*domains.InterviewAppointment, error) {
 	userId, err := primitive.ObjectIDFromHex(req.CreatedBy)
 	if err != nil {
 		return nil, helpers.InternalError
+	}
+	user, err := s.userRepo.Get(ctx, userId)
+	if err != nil {
+		return nil, helpers.InternalError
+	}
+	if user == nil {
+		return nil, helpers.NewCustomError(http.StatusUnauthorized, "Invalid user token")
 	}
 	params := &domains.CreateInterviewAppointmentParams{
 		Title:       req.Title,
@@ -58,7 +67,22 @@ func (s *interviewService) CreateInterviewAppointment(ctx context.Context, req *
 	if err != nil {
 		return nil, helpers.InternalError
 	}
-	return data, nil
+	return &domains.InterviewAppointment{
+		ID:          data.ID,
+		Title:       data.Title,
+		Description: data.Description,
+		Comments:    data.Comments,
+		Status:      data.Status,
+		IsArchived:  data.IsArchived,
+		CreateUser: domains.User{
+			ID:       user.ID,
+			Name:     user.Name,
+			Email:    user.Email,
+			ImageUrl: user.ImageUrl,
+		},
+		CreatedAt: data.CreatedAt,
+		UpdatedAt: data.UpdatedAt,
+	}, nil
 }
 
 func (s *interviewService) UpdateInterviewAppointment(ctx context.Context, req *dto.UpdateInterviewAppointmentRequest) error {

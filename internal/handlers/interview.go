@@ -138,9 +138,13 @@ func (h *interviewHandler) CreateInterviewAppointment(ctx *gin.Context) {
 			Title:       data.Title,
 			Description: data.Description,
 			Status:      data.Status,
-			CreateUser:  dto.User{},
-			CreatedAt:   data.CreatedAt,
-			Comments:    []dto.InterviewComment{},
+			CreateUser: dto.User{
+				Name:     data.CreateUser.Name,
+				Email:    data.CreateUser.Email,
+				ImageUrl: data.CreateUser.ImageUrl,
+			},
+			CreatedAt: data.CreatedAt,
+			Comments:  []dto.InterviewComment{},
 		},
 	}
 	ctx.JSON(http.StatusCreated, response)

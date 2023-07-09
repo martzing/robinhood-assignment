@@ -61,6 +61,12 @@ func (v interviewValidate) ValidateCreateInterviewAppointment(ctx *gin.Context) 
 	if err := ctx.BindJSON(&req); err != nil {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, "Invalid input parameter")
 	}
+	value, exists := ctx.Get("userId")
+	if !exists {
+		return nil, helpers.InternalError
+	}
+	userId := value.(string)
+	req.CreatedBy = userId
 	if _, err := govalidator.ValidateStruct(req); err != nil {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, err.Error())
 	}
