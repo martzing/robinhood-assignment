@@ -3,12 +3,10 @@ package handlers
 import (
 	"net/http"
 	"robinhood-assignment/helpers"
-	"robinhood-assignment/internal/core/domains"
 	"robinhood-assignment/internal/core/ports"
 	"robinhood-assignment/internal/dto"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type interviewHandler struct {
@@ -187,11 +185,6 @@ func (h *interviewHandler) ArchiveInterviewAppointment(ctx *gin.Context) {
 }
 
 func (h *interviewHandler) AddInterviewComment(ctx *gin.Context) {
-	id, _ := primitive.ObjectIDFromHex("64a9d15a033183d31aded893")
-	ctx.Set("user", domains.User{
-		ID:   id,
-		Name: "samart",
-	})
 	req, err := h.interviewValidate.ValidateAddInterviewComment(ctx)
 	if err != nil {
 		errRes := helpers.ErrorHandler(err)
@@ -211,11 +204,6 @@ func (h *interviewHandler) AddInterviewComment(ctx *gin.Context) {
 }
 
 func (h *interviewHandler) UpdateInterviewComment(ctx *gin.Context) {
-	id, _ := primitive.ObjectIDFromHex("64a9d16f033183d31aded895")
-	ctx.Set("user", domains.User{
-		ID:   id,
-		Name: "samart",
-	})
 	req, err := h.interviewValidate.ValidateUpdateInterviewComment(ctx)
 	if err != nil {
 		errRes := helpers.ErrorHandler(err)

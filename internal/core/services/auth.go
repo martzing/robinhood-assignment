@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"robinhood-assignment/config"
 	"robinhood-assignment/helpers"
@@ -24,20 +23,20 @@ func NewAuthService(userRepo ports.UserRepository, myBcrypt ports.MyBcrypt, myJW
 	return &authService{userRepo, myBcrypt, myJWT}
 }
 
-func (a *authService) RegisterAdmin(ctx context.Context, req *dto.RegisterAdminRequest) (*dto.RegisterAdminResponse, error) {
+func (a *authService) CreateStaff(ctx context.Context, req *dto.CreateStaffRequest) error {
 	user, err := a.userRepo.GetByUsername(ctx, req.Username)
 	if err != nil {
-		return nil, helpers.InternalError
+		return helpers.InternalError
 	}
 	if user != nil {
-		return nil, helpers.CustomError{
+		return helpers.CustomError{
 			StatusCode: http.StatusConflict,
 			Message:    "Duplicate username",
 		}
 	}
 	passHash, err := a.myBcrypt.GenerateFromPassword(req.Password, config.Get().Auth.BcryptCost)
 	if err != nil {
-		return nil, helpers.InternalError
+		return helpers.InternalError
 	}
 
 	createUserPatams := &domains.CreateUserParams{
@@ -49,31 +48,27 @@ func (a *authService) RegisterAdmin(ctx context.Context, req *dto.RegisterAdminR
 		Role:     req.Role,
 	}
 	if _, err := a.userRepo.Create(ctx, createUserPatams); err != nil {
-		fmt.Printf("err: %#v\n", err)
-		return nil, helpers.CustomError{
+		return helpers.CustomError{
 			StatusCode: http.StatusConflict,
-			Message:    "Create user fail.",
+			Message:    "Create staff fail.",
 		}
 	}
-	return &dto.RegisterAdminResponse{
-		StatusCode: http.StatusCreated,
-		Message:    "Register admin success.",
-	}, nil
+	return nil
 }
 
-func (a *authService) Login(ctx context.Context, params *dto.LoginRequest) (*dto.LoginResponse, error) {
+func (a *authService) Login(ctx context.Context, params *dto.LoginRequest) (string, error) {
 	user, err := a.userRepo.GetByUsername(ctx, params.Username)
 	if err != nil {
-		return nil, helpers.InternalError
+		return "", helpers.InternalError
 	}
 	if user == nil {
-		return nil, helpers.CustomError{
+		return "", helpers.CustomError{
 			StatusCode: http.StatusNotFound,
 			Message:    "Username not found",
 		}
 	}
 	if err := a.myBcrypt.CompareHashAndPassword(user.Password, params.Password); err != nil {
-		return nil, helpers.CustomError{
+		return "", helpers.CustomError{
 			StatusCode: http.StatusUnauthorized,
 			Message:    "Password is incorrect",
 		}
@@ -82,15 +77,12 @@ func (a *authService) Login(ctx context.Context, params *dto.LoginRequest) (*dto
 		UserID: user.ID.Hex(),
 		Role:   user.Role,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(10 * time.Minute)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(60 * time.Minute)),
 		},
 	})
 	tokenString, err := token.SignedString([]byte(config.Get().Auth.JwtSecret))
 	if err != nil {
-		return nil, helpers.InternalError
+		return "", helpers.InternalError
 	}
-	return &dto.LoginResponse{
-		StatusCode: http.StatusOK,
-		Token:      tokenString,
-	}, nil
+	return tokenString, nil
 }

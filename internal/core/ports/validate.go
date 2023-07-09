@@ -8,7 +8,7 @@ import (
 
 type AuthValidate interface {
 	ValidateLogin(ctx *gin.Context) (*dto.LoginRequest, error)
-	ValidateRegisterAdmin(ctx *gin.Context) (*dto.RegisterAdminRequest, error)
+	ValidateCreateStaff(ctx *gin.Context) (*dto.CreateStaffRequest, error)
 }
 
 type InterviewValidate interface {

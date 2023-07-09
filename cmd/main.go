@@ -12,6 +12,7 @@ import (
 	"robinhood-assignment/infrastructures"
 	"robinhood-assignment/internal/core/services"
 	"robinhood-assignment/internal/handlers"
+	"robinhood-assignment/internal/middlewares"
 	"robinhood-assignment/internal/repositories"
 	"robinhood-assignment/internal/validate"
 	"syscall"
@@ -36,17 +37,19 @@ func main() {
 	myBcrypt := helpers.NewMyBcrypt()
 	myJWT := helpers.NewMyJWT()
 
-	iarepo := repositories.NewInterviewAppointmentRepository(mc, config.Get().Mongo.Database)
+	interviewRepo := repositories.NewInterviewAppointmentRepository(mc, config.Get().Mongo.Database)
 	userRepo := repositories.NewUserRepository(mc, config.Get().Mongo.Database)
 
-	insvc := services.NewInterviewService(iarepo)
-	authsvc := services.NewAuthService(userRepo, myBcrypt, myJWT)
+	interviewService := services.NewInterviewService(interviewRepo)
+	authService := services.NewAuthService(userRepo, myBcrypt, myJWT)
 
-	invalidate := validate.NewInterviewValidate()
-	authvalidate := validate.NewAuthValidate()
+	interviewValidate := validate.NewInterviewValidate()
+	authValidate := validate.NewAuthValidate()
 
-	inhdl := handlers.NewInterviewHandler(insvc, invalidate)
-	authhdl := handlers.NewAuthHandler(authsvc, authvalidate)
+	interviewHandler := handlers.NewInterviewHandler(interviewService, interviewValidate)
+	authHandler := handlers.NewAuthHandler(authService, authValidate)
+
+	middleware := middlewares.NewMidlewares(myJWT)
 
 	r := gin.Default()
 	conf := cors.DefaultConfig()
@@ -56,14 +59,18 @@ func main() {
 	r.Use(helmet.Default())
 	r.GET("/healthz", func(ctx *gin.Context) { ctx.JSON(http.StatusOK, gin.H{"message": "OK"}) })
 
-	r.GET("/api/interviews", inhdl.GetInterviewAppointments)
-	r.GET("/api/interviews/:id", inhdl.GetInterviewAppointment)
-	r.POST("/api/interviews", inhdl.CreateInterviewAppointment)
-	r.PATCH("/api/interviews/:id", inhdl.UpdateInterviewAppointment)
-	r.PATCH("/api/interviews/:id/archive", inhdl.ArchiveInterviewAppointment)
-	r.POST("/api/interviews/:id/comment", inhdl.AddInterviewComment)
-	r.PATCH("/api/interviews/:id/comment/:commentId", inhdl.UpdateInterviewComment)
-	r.POST("/api/user", authhdl.RegisterAdmin)
+	interviewGroup := r.Group("/api/interviews")
+	interviewGroup.GET("", middleware.StaffMiddleware, interviewHandler.GetInterviewAppointments)
+	interviewGroup.GET("/:id", middleware.StaffMiddleware, interviewHandler.GetInterviewAppointment)
+	interviewGroup.POST("", middleware.StaffMiddleware, interviewHandler.CreateInterviewAppointment)
+	interviewGroup.PATCH("/:id", middleware.StaffMiddleware, interviewHandler.UpdateInterviewAppointment)
+	interviewGroup.PATCH("/:id/archive", middleware.StaffMiddleware, interviewHandler.ArchiveInterviewAppointment)
+	interviewGroup.POST("/:id/comment", middleware.StaffMiddleware, interviewHandler.AddInterviewComment)
+	interviewGroup.PATCH("/:id/comment/:commentId", middleware.StaffMiddleware, interviewHandler.UpdateInterviewComment)
+
+	authGroup := r.Group("/api/auth")
+	authGroup.POST("/login", authHandler.Login)
+	authGroup.POST("/staff", middleware.AdminMiddleware, authHandler.CreateStaff)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", config.Get().HTTPServer.Port),

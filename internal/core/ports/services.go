@@ -7,8 +7,8 @@ import (
 )
 
 type AuthServie interface {
-	RegisterAdmin(ctx context.Context, params *dto.RegisterAdminRequest) (*dto.RegisterAdminResponse, error)
-	Login(ctx context.Context, params *dto.LoginRequest) (*dto.LoginResponse, error)
+	CreateStaff(ctx context.Context, params *dto.CreateStaffRequest) error
+	Login(ctx context.Context, params *dto.LoginRequest) (string, error)
 }
 
 type InterviewService interface {

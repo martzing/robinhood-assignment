@@ -3,7 +3,6 @@ package validate
 import (
 	"net/http"
 	"robinhood-assignment/helpers"
-	"robinhood-assignment/internal/core/domains"
 	"robinhood-assignment/internal/core/ports"
 	"robinhood-assignment/internal/dto"
 	"strconv"
@@ -113,12 +112,12 @@ func (v interviewValidate) ValidateAddInterviewComment(ctx *gin.Context) (*dto.A
 		return nil, helpers.NewCustomError(http.StatusBadRequest, "id: Missing required field")
 	}
 	req.ID = id
-	value, exists := ctx.Get("user")
+	value, exists := ctx.Get("userId")
 	if !exists {
 		return nil, helpers.InternalError
 	}
-	user := value.(domains.User)
-	req.UserID = user.ID.Hex()
+	userId := value.(string)
+	req.UserID = userId
 
 	if _, err := govalidator.ValidateStruct(req); err != nil {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, err.Error())
@@ -141,15 +140,12 @@ func (v interviewValidate) ValidateUpdateInterviewComment(ctx *gin.Context) (*dt
 		return nil, helpers.NewCustomError(http.StatusBadRequest, "commentId: Missing required field")
 	}
 	req.CommentID = commentId
-	value, exists := ctx.Get("user")
+	value, exists := ctx.Get("userId")
 	if !exists {
 		return nil, helpers.InternalError
 	}
-	if !exists {
-		return nil, helpers.InternalError
-	}
-	user := value.(domains.User)
-	req.UserID = user.ID.Hex()
+	userId := value.(string)
+	req.UserID = userId
 
 	if _, err := govalidator.ValidateStruct(req); err != nil {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, err.Error())

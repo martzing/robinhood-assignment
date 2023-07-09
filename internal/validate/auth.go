@@ -28,8 +28,8 @@ func (v authValidate) ValidateLogin(ctx *gin.Context) (*dto.LoginRequest, error)
 	return params, nil
 }
 
-func (v authValidate) ValidateRegisterAdmin(ctx *gin.Context) (*dto.RegisterAdminRequest, error) {
-	params := &dto.RegisterAdminRequest{}
+func (v authValidate) ValidateCreateStaff(ctx *gin.Context) (*dto.CreateStaffRequest, error) {
+	params := &dto.CreateStaffRequest{}
 	if err := ctx.BindJSON(params); err != nil {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, "Invalid input parameter")
 	}

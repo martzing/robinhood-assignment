@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"robinhood-assignment/helpers"
 	"robinhood-assignment/internal/core/ports"
+	"robinhood-assignment/internal/dto"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,21 +18,23 @@ func NewAuthHandler(authSvc ports.AuthServie, validate ports.AuthValidate) ports
 	return &authHandler{authSvc, validate}
 }
 
-func (a *authHandler) RegisterAdmin(ctx *gin.Context) {
-	params, err := a.validate.ValidateRegisterAdmin(ctx)
+func (a *authHandler) CreateStaff(ctx *gin.Context) {
+	params, err := a.validate.ValidateCreateStaff(ctx)
 	if err != nil {
 		errRes := helpers.ErrorHandler(err)
 		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
 		return
 	}
 
-	res, err := a.authSvc.RegisterAdmin(ctx, params)
-	if err != nil {
+	if err := a.authSvc.CreateStaff(ctx, params); err != nil {
 		errRes := helpers.ErrorHandler(err)
 		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
 		return
 	}
-	ctx.JSON(http.StatusCreated, res)
+	ctx.JSON(http.StatusCreated, dto.BaseResponse{
+		StatusCode: http.StatusOK,
+		Message:    "success",
+	})
 }
 
 func (a *authHandler) Login(ctx *gin.Context) {
@@ -42,11 +45,15 @@ func (a *authHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	res, err := a.authSvc.Login(ctx, params)
+	token, err := a.authSvc.Login(ctx, params)
 	if err != nil {
 		errRes := helpers.ErrorHandler(err)
 		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
 		return
 	}
-	ctx.JSON(http.StatusOK, res)
+	response := dto.LoginResponse{
+		StatusCode: http.StatusOK,
+		Token:      token,
+	}
+	ctx.JSON(http.StatusOK, response)
 }

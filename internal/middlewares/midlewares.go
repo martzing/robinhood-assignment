@@ -60,3 +60,43 @@ func (m middlewares) AdminMiddleware(ctx *gin.Context) {
 	ctx.Set("role", claims.Role)
 	ctx.Next()
 }
+
+func (m middlewares) StaffMiddleware(ctx *gin.Context) {
+	authorization := ctx.GetHeader("Authorization")
+	if authorization == "" {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, dto.ErrorResponse{
+			StatusCode: http.StatusUnauthorized,
+			Error:      "Authorization is missing",
+		})
+		return
+	}
+	jwtToken := strings.Split(authorization, "Bearer ")
+	if len(jwtToken) != 2 {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, dto.ErrorResponse{
+			StatusCode: http.StatusUnauthorized,
+			Error:      "Invalid token format",
+		})
+		return
+	}
+	tokenString := jwtToken[1]
+	claims := &domains.Claims{}
+	if _, err := m.myJWT.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(config.Get().Auth.JwtSecret), nil
+	}); err != nil {
+		ctx.AbortWithStatusJSON(http.StatusUnauthorized, dto.ErrorResponse{
+			StatusCode: http.StatusUnauthorized,
+			Error:      err.Error(),
+		})
+		return
+	}
+	if claims.Role != constants.STAFF_ROLE && claims.Role != constants.ADMIN_ROLE {
+		ctx.AbortWithStatusJSON(http.StatusForbidden, dto.ErrorResponse{
+			StatusCode: http.StatusForbidden,
+			Error:      "You don't have permission for this API",
+		})
+		return
+	}
+	ctx.Set("userId", claims.UserID)
+	ctx.Set("role", claims.Role)
+	ctx.Next()
+}

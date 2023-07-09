@@ -5,7 +5,7 @@ import (
 )
 
 type AuthHandler interface {
-	RegisterAdmin(ctx *gin.Context)
+	CreateStaff(ctx *gin.Context)
 	Login(ctx *gin.Context)
 }
 
