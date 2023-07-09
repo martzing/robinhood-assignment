@@ -46,6 +46,29 @@ type CreateInterviewAppointmentResponse struct {
 	Data       InterviewAppointmentDetail `json:"data"`
 }
 
+type AddInterviewCommentRequest struct {
+	ID      string `json:"id" from:"id" valid:"type(string)"`
+	Comment string `json:"comment" from:"comment" valid:"type(string)"`
+	UserID  string `json:"userId" from:"userId" valid:"type(string)"`
+}
+
+type AddInterviewCommentResponse struct {
+	StatusCode int    `json:"statusCode"`
+	Message    string `json:"message"`
+}
+
+type UpdateInterviewAppointmentRequest struct {
+	ID          string `json:"id" from:"id" valid:"type(string)"`
+	Title       string `json:"title" from:"title" valid:"type(string),optional"`
+	Description string `json:"description" from:"description" valid:"type(string),optional"`
+	Status      string `json:"status" from:"status" valid:"type(string),in(TODO|IN_PROGRESS|DONE),optional"`
+}
+
+type UpdateInterviewAppointmentResponse struct {
+	StatusCode int    `json:"statusCode"`
+	Message    string `json:"message"`
+}
+
 type InterviewAppointmentDetail struct {
 	ID          string             `json:"id"`
 	Title       string             `json:"title"`

@@ -17,6 +17,7 @@ type InterviewAppointmentRepository interface {
 	GetAll(ctx context.Context, offset int64, limit int64) ([]domains.InterviewAppointment, error)
 	Get(ctx context.Context, id primitive.ObjectID) (*domains.InterviewAppointment, error)
 	Create(ctx context.Context, params *domains.CreateInterviewAppointmentParams) (*domains.CreateInterviewAppointment, error)
-	// Update(ctx context.Context, params *domains.UpdateFortuneTellingParams) (*domains.FortuneTelling, error)
+	Update(ctx context.Context, params *domains.UpdateInterviewAppointmentParams) (*domains.InterviewAppointment, error)
 	// Delete(ctx context.Context, id string) error
+	AddComment(ctx context.Context, params *domains.AddInterviewCommentParams) error
 }

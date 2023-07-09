@@ -15,4 +15,6 @@ type InterviewValidate interface {
 	ValidateGetInterviewAppointments(ctx *gin.Context) (*dto.GetInterviewAppointmentsRequest, error)
 	ValidateGetInterviewAppointment(ctx *gin.Context) (string, error)
 	ValidateCreateInterviewAppointment(ctx *gin.Context) (*dto.CreateInterviewAppointmentRequest, error)
+	ValidateUpdateInterviewAppointment(ctx *gin.Context) (*dto.UpdateInterviewAppointmentRequest, error)
+	ValidateAddInterviewComment(ctx *gin.Context) (*dto.AddInterviewCommentRequest, error)
 }

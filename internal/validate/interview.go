@@ -3,6 +3,7 @@ package validate
 import (
 	"net/http"
 	"robinhood-assignment/helpers"
+	"robinhood-assignment/internal/core/domains"
 	"robinhood-assignment/internal/core/ports"
 	"robinhood-assignment/internal/dto"
 	"strconv"
@@ -61,6 +62,43 @@ func (v interviewValidate) ValidateCreateInterviewAppointment(ctx *gin.Context) 
 	if err := ctx.BindJSON(&req); err != nil {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, "Invalid input parameter")
 	}
+	if _, err := govalidator.ValidateStruct(req); err != nil {
+		return nil, helpers.NewCustomError(http.StatusBadRequest, err.Error())
+	}
+	return &req, nil
+}
+
+func (v interviewValidate) ValidateUpdateInterviewAppointment(ctx *gin.Context) (*dto.UpdateInterviewAppointmentRequest, error) {
+	req := dto.UpdateInterviewAppointmentRequest{}
+	if err := ctx.BindJSON(&req); err != nil {
+		return nil, helpers.NewCustomError(http.StatusBadRequest, "Invalid input parameter")
+	}
+	if req.Title == "" && req.Description == "" && req.Status == "" {
+		return nil, helpers.NewCustomError(http.StatusBadRequest, "at least one field required")
+	}
+	if _, err := govalidator.ValidateStruct(req); err != nil {
+		return nil, helpers.NewCustomError(http.StatusBadRequest, err.Error())
+	}
+	formats := strfmt.Default
+	if err := validate.FormatOf("id", "body", "bsonobjectid", req.ID, formats); err != nil {
+		return nil, helpers.NewCustomError(http.StatusBadRequest, err.Error())
+	}
+	return &req, nil
+}
+
+func (v interviewValidate) ValidateAddInterviewComment(ctx *gin.Context) (*dto.AddInterviewCommentRequest, error) {
+	req := dto.AddInterviewCommentRequest{}
+	if err := ctx.BindJSON(&req); err != nil {
+		return nil, helpers.NewCustomError(http.StatusBadRequest, "Invalid input parameter")
+	}
+
+	value, exists := ctx.Get("user")
+	if !exists {
+		return nil, helpers.InternalError
+	}
+	user := value.(domains.User)
+	req.UserID = user.ID.Hex()
+
 	if _, err := govalidator.ValidateStruct(req); err != nil {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, err.Error())
 	}

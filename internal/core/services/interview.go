@@ -9,6 +9,7 @@ import (
 	"robinhood-assignment/internal/dto"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type interviewService struct {
@@ -54,5 +55,52 @@ func (s *interviewService) CreateInterviewAppointment(ctx context.Context, req *
 		UserID:      userId,
 	}
 	data, err := s.interviewAppointmentRepo.Create(ctx, params)
+	if err != nil {
+		return nil, helpers.InternalError
+	}
 	return data, nil
+}
+
+func (s *interviewService) UpdateInterviewAppointment(ctx context.Context, req *dto.UpdateInterviewAppointmentRequest) error {
+	id, err := primitive.ObjectIDFromHex(req.ID)
+	if err != nil {
+		return helpers.InternalError
+	}
+	params := &domains.UpdateInterviewAppointmentParams{
+		ID:          id,
+		Title:       req.Title,
+		Description: req.Description,
+		Status:      req.Status,
+	}
+	data, err := s.interviewAppointmentRepo.Update(ctx, params)
+	if data == nil {
+		return helpers.NewCustomError(http.StatusNotFound, "Interview appointment not found.")
+	}
+	if err != nil {
+		return helpers.InternalError
+	}
+	return nil
+}
+
+func (s *interviewService) AddInterviewComment(ctx context.Context, req *dto.AddInterviewCommentRequest) error {
+	id, err := primitive.ObjectIDFromHex(req.ID)
+	if err != nil {
+		return helpers.InternalError
+	}
+	userId, err := primitive.ObjectIDFromHex(req.UserID)
+	if err != nil {
+		return helpers.InternalError
+	}
+	params := &domains.AddInterviewCommentParams{
+		ID:      id,
+		Comment: req.Comment,
+		UserID:  userId,
+	}
+	if err := s.interviewAppointmentRepo.AddComment(ctx, params); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return helpers.NewCustomError(http.StatusNotFound, "Interview appointment not found.")
+		}
+		return helpers.InternalError
+	}
+	return nil
 }

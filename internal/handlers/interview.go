@@ -3,10 +3,12 @@ package handlers
 import (
 	"net/http"
 	"robinhood-assignment/helpers"
+	"robinhood-assignment/internal/core/domains"
 	"robinhood-assignment/internal/core/ports"
 	"robinhood-assignment/internal/dto"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type interviewHandler struct {
@@ -84,13 +86,19 @@ func (h *interviewHandler) GetInterviewAppointment(ctx *gin.Context) {
 		return
 	}
 
-	comments := make([]dto.InterviewComment, len(data.Comments))
+	comments := []dto.InterviewComment{}
 	for i := 0; i < len(data.Comments); i++ {
-		comments[i] = dto.InterviewComment{
-			ID:        data.Comments[i].ID.Hex(),
-			Comment:   data.Comments[i].Comment,
-			User:      dto.User{},
-			CreatedAt: data.CreatedAt,
+		if !data.Comments[i].ID.IsZero() {
+			comments = append(comments, dto.InterviewComment{
+				ID:      data.Comments[i].ID.Hex(),
+				Comment: data.Comments[i].Comment,
+				User: dto.User{
+					Name:     data.Comments[i].User.Name,
+					Email:    data.Comments[i].User.Email,
+					ImageUrl: data.Comments[i].User.ImageUrl,
+				},
+				CreatedAt: data.CreatedAt,
+			})
 		}
 	}
 	response := dto.GetInterviewAppointmentResponse{
@@ -138,4 +146,47 @@ func (h *interviewHandler) CreateInterviewAppointment(ctx *gin.Context) {
 		},
 	}
 	ctx.JSON(http.StatusCreated, response)
+}
+
+func (h *interviewHandler) UpdateInterviewAppointment(ctx *gin.Context) {
+	req, err := h.interviewValidate.ValidateUpdateInterviewAppointment(ctx)
+	if err != nil {
+		errRes := helpers.ErrorHandler(err)
+		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
+		return
+	}
+	if err := h.interviewService.UpdateInterviewAppointment(ctx, req); err != nil {
+		errRes := helpers.ErrorHandler(err)
+		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
+		return
+	}
+	response := dto.UpdateInterviewAppointmentResponse{
+		StatusCode: http.StatusOK,
+		Message:    "success",
+	}
+	ctx.JSON(http.StatusOK, response)
+}
+
+func (h *interviewHandler) AddInterviewComment(ctx *gin.Context) {
+	id, _ := primitive.ObjectIDFromHex("64a9d15a033183d31aded893")
+	ctx.Set("user", domains.User{
+		ID:   id,
+		Name: "samart",
+	})
+	req, err := h.interviewValidate.ValidateAddInterviewComment(ctx)
+	if err != nil {
+		errRes := helpers.ErrorHandler(err)
+		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
+		return
+	}
+	if err := h.interviewService.AddInterviewComment(ctx, req); err != nil {
+		errRes := helpers.ErrorHandler(err)
+		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, dto.AddInterviewCommentResponse{
+		StatusCode: http.StatusOK,
+		Message:    "success",
+	})
 }
