@@ -128,6 +128,25 @@ func (s *interviewService) UpdateInterviewComment(ctx context.Context, req *dto.
 	if err != nil {
 		return helpers.InternalError
 	}
+	data, err := s.interviewAppointmentRepo.Get(ctx, id)
+	if err != nil {
+		return helpers.InternalError
+	}
+	if data == nil {
+		return helpers.NewCustomError(http.StatusNotFound, "Interview appointment not found.")
+	}
+	comment := &domains.InterviewComment{}
+	for i := 0; i < len(data.Comments); i++ {
+		if data.Comments[i].ID == commentId {
+			comment = &data.Comments[i]
+		}
+	}
+	if comment == nil {
+		return helpers.NewCustomError(http.StatusNotFound, "Interview comment not found.")
+	}
+	if comment.User.ID.Hex() != req.UserID {
+		return helpers.NewCustomError(http.StatusForbidden, "You don't have permission to update this comment")
+	}
 	params := domains.UpdateInterviewCommentParams{
 		ID:        id,
 		CommentID: commentId,

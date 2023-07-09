@@ -61,6 +61,7 @@ type UpdateInterviewCommentRequest struct {
 	ID        string `json:"id" from:"id" valid:"type(string)"`
 	CommentID string `json:"commentId" from:"commentId" valid:"type(string)"`
 	Comment   string `json:"comment" from:"comment" valid:"type(string)"`
+	UserID    string `json:"userId" from:"userId" valid:"type(string)"`
 }
 
 type UpdateInterviewAppointmentRequest struct {

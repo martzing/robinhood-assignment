@@ -211,6 +211,11 @@ func (h *interviewHandler) AddInterviewComment(ctx *gin.Context) {
 }
 
 func (h *interviewHandler) UpdateInterviewComment(ctx *gin.Context) {
+	id, _ := primitive.ObjectIDFromHex("64a9d16f033183d31aded895")
+	ctx.Set("user", domains.User{
+		ID:   id,
+		Name: "samart",
+	})
 	req, err := h.interviewValidate.ValidateUpdateInterviewComment(ctx)
 	if err != nil {
 		errRes := helpers.ErrorHandler(err)

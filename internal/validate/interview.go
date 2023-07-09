@@ -141,6 +141,15 @@ func (v interviewValidate) ValidateUpdateInterviewComment(ctx *gin.Context) (*dt
 		return nil, helpers.NewCustomError(http.StatusBadRequest, "commentId: Missing required field")
 	}
 	req.CommentID = commentId
+	value, exists := ctx.Get("user")
+	if !exists {
+		return nil, helpers.InternalError
+	}
+	if !exists {
+		return nil, helpers.InternalError
+	}
+	user := value.(domains.User)
+	req.UserID = user.ID.Hex()
 
 	if _, err := govalidator.ValidateStruct(req); err != nil {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, err.Error())
