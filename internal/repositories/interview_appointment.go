@@ -185,13 +185,31 @@ func (r *interviewAppointmentRepository) AddComment(ctx context.Context, params 
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
-	update := bson.D{
-		{
-			Key:   "$push",
-			Value: bson.D{{Key: "comments", Value: comment}},
-		},
+	update := bson.D{{Key: "$push", Value: bson.D{{Key: "comments", Value: comment}}}}
+	opts := &options.FindOneAndUpdateOptions{}
+	opts.SetUpsert(false)
+	if err := r.col.FindOneAndUpdate(ctx, filter, update, opts).Err(); err != nil {
+		return err
 	}
-	if err := r.col.FindOneAndUpdate(ctx, filter, update).Err(); err != nil {
+	return nil
+}
+
+func (r *interviewAppointmentRepository) UpdateComment(ctx context.Context, params *domains.UpdateInterviewCommentParams) error {
+	now := time.Now()
+	filter := bson.D{
+		{Key: "_id", Value: params.ID},
+		{Key: "isArchived", Value: false},
+		{Key: "comments._id", Value: params.CommentID},
+	}
+	update := bson.D{
+		{Key: "$set", Value: bson.D{
+			{Key: "comments.$.comment", Value: params.Comment},
+			{Key: "comments.$.updatedAt", Value: now},
+		}},
+	}
+	opts := &options.FindOneAndUpdateOptions{}
+	opts.SetUpsert(false)
+	if err := r.col.FindOneAndUpdate(ctx, filter, update, opts).Err(); err != nil {
 		return err
 	}
 	return nil

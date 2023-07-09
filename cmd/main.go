@@ -62,6 +62,7 @@ func main() {
 	r.PATCH("/api/interviews/:id", inhdl.UpdateInterviewAppointment)
 	r.PATCH("/api/interviews/:id/archive", inhdl.ArchiveInterviewAppointment)
 	r.POST("/api/interviews/:id/comment", inhdl.AddInterviewComment)
+	r.PATCH("/api/interviews/:id/comment/:commentId", inhdl.UpdateInterviewComment)
 	r.POST("/api/user", authhdl.RegisterAdmin)
 
 	srv := &http.Server{

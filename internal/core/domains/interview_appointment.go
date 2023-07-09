@@ -10,7 +10,7 @@ type CreateInterviewAppointment struct {
 	ID           primitive.ObjectID `bson:"_id"`
 	Title        string             `bson:"title"`
 	Description  string             `bson:"description"`
-	Comments     []InterviewComment `bson:"comments,omitempty"`
+	Comments     []InterviewComment `bson:"comments"`
 	Status       string             `bson:"status"`
 	IsArchived   bool               `bson:"isArchived"`
 	CreateUserId primitive.ObjectID `bson:"createUserId"`
@@ -22,7 +22,7 @@ type InterviewAppointment struct {
 	ID          primitive.ObjectID `bson:"_id"`
 	Title       string             `bson:"title"`
 	Description string             `bson:"description"`
-	Comments    []InterviewComment `bson:"comments,omitempty"`
+	Comments    []InterviewComment `bson:"comments"`
 	Status      string             `bson:"status"`
 	IsArchived  bool               `bson:"isArchived"`
 	CreateUser  User               `bson:"createUser"`

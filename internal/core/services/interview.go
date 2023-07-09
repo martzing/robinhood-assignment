@@ -118,3 +118,26 @@ func (s *interviewService) AddInterviewComment(ctx context.Context, req *dto.Add
 	}
 	return nil
 }
+
+func (s *interviewService) UpdateInterviewComment(ctx context.Context, req *dto.UpdateInterviewCommentRequest) error {
+	id, err := primitive.ObjectIDFromHex(req.ID)
+	if err != nil {
+		return helpers.InternalError
+	}
+	commentId, err := primitive.ObjectIDFromHex(req.CommentID)
+	if err != nil {
+		return helpers.InternalError
+	}
+	params := domains.UpdateInterviewCommentParams{
+		ID:        id,
+		CommentID: commentId,
+		Comment:   req.Comment,
+	}
+	if err := s.interviewAppointmentRepo.UpdateComment(ctx, &params); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return helpers.NewCustomError(http.StatusNotFound, "Interview comment not found.")
+		}
+		return helpers.InternalError
+	}
+	return nil
+}

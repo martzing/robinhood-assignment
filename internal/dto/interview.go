@@ -57,6 +57,12 @@ type AddInterviewCommentRequest struct {
 	UserID  string `json:"userId" from:"userId" valid:"type(string)"`
 }
 
+type UpdateInterviewCommentRequest struct {
+	ID        string `json:"id" from:"id" valid:"type(string)"`
+	CommentID string `json:"commentId" from:"commentId" valid:"type(string)"`
+	Comment   string `json:"comment" from:"comment" valid:"type(string)"`
+}
+
 type UpdateInterviewAppointmentRequest struct {
 	ID          string `json:"id" from:"id" valid:"type(string)"`
 	Title       string `json:"title" from:"title" valid:"type(string),optional"`

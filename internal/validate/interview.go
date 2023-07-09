@@ -125,3 +125,32 @@ func (v interviewValidate) ValidateAddInterviewComment(ctx *gin.Context) (*dto.A
 	}
 	return &req, nil
 }
+
+func (v interviewValidate) ValidateUpdateInterviewComment(ctx *gin.Context) (*dto.UpdateInterviewCommentRequest, error) {
+	req := dto.UpdateInterviewCommentRequest{}
+	if err := ctx.BindJSON(&req); err != nil {
+		return nil, helpers.NewCustomError(http.StatusBadRequest, "Invalid input parameter")
+	}
+	id := ctx.Param("id")
+	if id == "" {
+		return nil, helpers.NewCustomError(http.StatusBadRequest, "id: Missing required field")
+	}
+	req.ID = id
+	commentId := ctx.Param("commentId")
+	if commentId == "" {
+		return nil, helpers.NewCustomError(http.StatusBadRequest, "commentId: Missing required field")
+	}
+	req.CommentID = commentId
+
+	if _, err := govalidator.ValidateStruct(req); err != nil {
+		return nil, helpers.NewCustomError(http.StatusBadRequest, err.Error())
+	}
+	formats := strfmt.Default
+	if err := validate.FormatOf("id", "param", "bsonobjectid", id, formats); err != nil {
+		return nil, helpers.NewCustomError(http.StatusBadRequest, err.Error())
+	}
+	if err := validate.FormatOf("commentId", "param", "bsonobjectid", commentId, formats); err != nil {
+		return nil, helpers.NewCustomError(http.StatusBadRequest, err.Error())
+	}
+	return &req, nil
+}

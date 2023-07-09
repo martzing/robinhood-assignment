@@ -10,20 +10,26 @@ type AddInterviewComment struct {
 	ID        primitive.ObjectID `bson:"_id"`
 	Comment   string             `bson:"comment"`
 	UserID    primitive.ObjectID `bson:"userId"`
-	CreatedAt time.Time          `bson:"CreatedAt"`
-	UpdatedAt time.Time          `bson:"UpdatedAt"`
+	CreatedAt time.Time          `bson:"createdAt"`
+	UpdatedAt time.Time          `bson:"updatedAt"`
 }
 
 type InterviewComment struct {
 	ID        primitive.ObjectID `bson:"_id"`
 	Comment   string             `bson:"comment"`
-	User      User               `bson:"user,omitempty"`
-	CreatedAt time.Time          `bson:"CreatedAt"`
-	UpdatedAt time.Time          `bson:"UpdatedAt"`
+	User      User               `bson:"user"`
+	CreatedAt time.Time          `bson:"createdAt"`
+	UpdatedAt time.Time          `bson:"updatedAt"`
 }
 
 type AddInterviewCommentParams struct {
-	ID      primitive.ObjectID `bson:"_id"`
-	Comment string             `bson:"comment"`
-	UserID  primitive.ObjectID `bson:"userId"`
+	ID      primitive.ObjectID
+	Comment string
+	UserID  primitive.ObjectID
+}
+
+type UpdateInterviewCommentParams struct {
+	ID        primitive.ObjectID
+	CommentID primitive.ObjectID
+	Comment   string
 }

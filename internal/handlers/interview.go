@@ -209,3 +209,22 @@ func (h *interviewHandler) AddInterviewComment(ctx *gin.Context) {
 		Message:    "success",
 	})
 }
+
+func (h *interviewHandler) UpdateInterviewComment(ctx *gin.Context) {
+	req, err := h.interviewValidate.ValidateUpdateInterviewComment(ctx)
+	if err != nil {
+		errRes := helpers.ErrorHandler(err)
+		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
+		return
+	}
+	if err := h.interviewService.UpdateInterviewComment(ctx, req); err != nil {
+		errRes := helpers.ErrorHandler(err)
+		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
+		return
+	}
+	response := dto.BaseResponse{
+		StatusCode: http.StatusOK,
+		Message:    "success",
+	}
+	ctx.JSON(http.StatusOK, response)
+}
