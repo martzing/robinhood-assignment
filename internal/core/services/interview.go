@@ -97,11 +97,11 @@ func (s *interviewService) UpdateInterviewAppointment(ctx context.Context, req *
 		Status:      req.Status,
 	}
 	data, err := s.interviewAppointmentRepo.Update(ctx, params)
-	if data == nil {
-		return helpers.NewCustomError(http.StatusNotFound, "Interview appointment not found.")
-	}
 	if err != nil {
 		return helpers.InternalError
+	}
+	if data == nil {
+		return helpers.NewCustomError(http.StatusNotFound, "Interview appointment not found.")
 	}
 	return nil
 }
@@ -159,7 +159,7 @@ func (s *interviewService) UpdateInterviewComment(ctx context.Context, req *dto.
 	if data == nil {
 		return helpers.NewCustomError(http.StatusNotFound, "Interview appointment not found.")
 	}
-	comment := &domains.InterviewComment{}
+	var comment *domains.InterviewComment
 	for i := 0; i < len(data.Comments); i++ {
 		if data.Comments[i].ID == commentId {
 			comment = &data.Comments[i]
@@ -173,7 +173,7 @@ func (s *interviewService) UpdateInterviewComment(ctx context.Context, req *dto.
 	}
 	params := domains.UpdateInterviewCommentParams{
 		ID:        id,
-		CommentID: commentId,
+		CommentID: comment.ID,
 		Comment:   req.Comment,
 	}
 	if err := s.interviewAppointmentRepo.UpdateComment(ctx, &params); err != nil {
