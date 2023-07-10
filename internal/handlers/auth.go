@@ -19,33 +19,34 @@ func NewAuthHandler(authSvc ports.AuthServie, validate ports.AuthValidate) ports
 }
 
 func (a *authHandler) CreateStaff(ctx *gin.Context) {
-	params, err := a.validate.ValidateCreateStaff(ctx)
+	req, err := a.validate.ValidateCreateStaff(ctx)
 	if err != nil {
 		errRes := helpers.ErrorHandler(err)
 		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
 		return
 	}
 
-	if err := a.authSvc.CreateStaff(ctx, params); err != nil {
+	if err := a.authSvc.CreateStaff(ctx, req); err != nil {
 		errRes := helpers.ErrorHandler(err)
 		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
 		return
 	}
-	ctx.JSON(http.StatusCreated, dto.BaseResponse{
+	response := dto.BaseResponse{
 		StatusCode: http.StatusOK,
 		Message:    "success",
-	})
+	}
+	ctx.JSON(http.StatusOK, response)
 }
 
 func (a *authHandler) Login(ctx *gin.Context) {
-	params, err := a.validate.ValidateLogin(ctx)
+	req, err := a.validate.ValidateLogin(ctx)
 	if err != nil {
 		errRes := helpers.ErrorHandler(err)
 		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
 		return
 	}
 
-	token, err := a.authSvc.Login(ctx, params)
+	token, err := a.authSvc.Login(ctx, req)
 	if err != nil {
 		errRes := helpers.ErrorHandler(err)
 		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)

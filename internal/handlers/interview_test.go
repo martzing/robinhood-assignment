@@ -300,6 +300,7 @@ func TestGetInterviewAppointment(t *testing.T) {
 }
 
 func TestCreateInterviewAppointment(t *testing.T) {
+	gin.SetMode(gin.TestMode)
 	t.Run("create interview appointment success", func(t *testing.T) {
 		req := dto.CreateInterviewAppointmentRequest{
 			Title:       mockInterviewAppointment1.Title,
@@ -377,6 +378,7 @@ func TestCreateInterviewAppointment(t *testing.T) {
 }
 
 func TestUpdateInterviewAppointment(t *testing.T) {
+	gin.SetMode(gin.TestMode)
 	t.Run("update interview appointment success", func(t *testing.T) {
 		req := dto.UpdateInterviewAppointmentRequest{
 			ID:          mockInterviewAppointment1.ID.Hex(),
@@ -441,6 +443,7 @@ func TestUpdateInterviewAppointment(t *testing.T) {
 }
 
 func TestArchiveInterviewAppointment(t *testing.T) {
+	gin.SetMode(gin.TestMode)
 	t.Run("archive interview appointment success", func(t *testing.T) {
 		id := "6476f457e64589e868aac981"
 		res := dto.BaseResponse{
@@ -495,6 +498,7 @@ func TestArchiveInterviewAppointment(t *testing.T) {
 }
 
 func TestAddInterviewComment(t *testing.T) {
+	gin.SetMode(gin.TestMode)
 	t.Run("add interview comment success", func(t *testing.T) {
 		req := dto.AddInterviewCommentRequest{
 			ID:      "6476f457e64589e868aac981",
@@ -557,6 +561,7 @@ func TestAddInterviewComment(t *testing.T) {
 }
 
 func TestUpdateInterviewComment(t *testing.T) {
+	gin.SetMode(gin.TestMode)
 	t.Run("update interview comment success", func(t *testing.T) {
 		req := dto.UpdateInterviewCommentRequest{
 			ID:        "6476f457e64589e868aac981",

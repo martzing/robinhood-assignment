@@ -59,7 +59,7 @@ func (a *authService) Login(ctx context.Context, req *dto.LoginRequest) (string,
 		return "", helpers.NewCustomError(http.StatusNotFound, "Username not found")
 	}
 	if err := a.myBcrypt.CompareHashAndPassword(user.Password, req.Password); err != nil {
-		return "", helpers.NewCustomError(http.StatusNotFound, "Password is incorrect")
+		return "", helpers.NewCustomError(http.StatusUnauthorized, "Password is incorrect")
 	}
 	token := a.myJWT.NewWithClaims(jwt.SigningMethodHS256, domains.Claims{
 		UserID: user.ID.Hex(),

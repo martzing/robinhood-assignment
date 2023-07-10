@@ -18,23 +18,23 @@ func NewAuthValidate() ports.AuthValidate {
 }
 
 func (v authValidate) ValidateLogin(ctx *gin.Context) (*dto.LoginRequest, error) {
-	params := &dto.LoginRequest{}
-	if err := ctx.BindJSON(params); err != nil {
+	req := &dto.LoginRequest{}
+	if err := ctx.BindJSON(req); err != nil {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, "Invalid input parameter")
 	}
-	if _, err := govalidator.ValidateStruct(params); err != nil {
+	if _, err := govalidator.ValidateStruct(req); err != nil {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, err.Error())
 	}
-	return params, nil
+	return req, nil
 }
 
 func (v authValidate) ValidateCreateStaff(ctx *gin.Context) (*dto.CreateStaffRequest, error) {
-	params := &dto.CreateStaffRequest{}
-	if err := ctx.BindJSON(params); err != nil {
+	req := &dto.CreateStaffRequest{}
+	if err := ctx.BindJSON(req); err != nil {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, "Invalid input parameter")
 	}
-	if _, err := govalidator.ValidateStruct(params); err != nil {
+	if _, err := govalidator.ValidateStruct(req); err != nil {
 		return nil, helpers.NewCustomError(http.StatusBadRequest, err.Error())
 	}
-	return params, nil
+	return req, nil
 }
