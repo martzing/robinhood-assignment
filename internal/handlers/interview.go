@@ -37,7 +37,7 @@ func (h *interviewHandler) GetInterviewAppointments(ctx *gin.Context) {
 	offset := (req.Page - 1) * req.Limit
 	limit := req.Limit + 1
 
-	data, err := h.interviewService.GetInterviewAppointments(ctx, int64(offset), int64(limit))
+	data, err := h.interviewService.GetInterviewAppointments(ctx, uint32(offset), uint32(limit))
 	if err != nil {
 		errRes := helpers.ErrorHandler(err)
 		ctx.AbortWithStatusJSON(errRes.StatusCode, errRes)
@@ -63,8 +63,8 @@ func (h *interviewHandler) GetInterviewAppointments(ctx *gin.Context) {
 		StatusCode: http.StatusOK,
 		Data:       interviews,
 		Pagination: dto.Pagination{
-			Page:    uint64(req.Page),
-			Size:    uint64(size),
+			Page:    uint32(req.Page),
+			Size:    uint32(size),
 			HasNext: hasNext,
 		},
 	}

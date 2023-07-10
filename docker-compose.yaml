@@ -21,3 +21,5 @@ services:
     environment:
       MONGO_URI: mongodb://mongodb:27017
       DB_NAME: interview
+      JWT_SECRET: your-jwt-secret
+      BCRYPT_COST: 8

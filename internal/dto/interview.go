@@ -10,14 +10,14 @@ type BaseResponse struct {
 }
 
 type Pagination struct {
-	Page    uint64 `json:"page"`
-	Size    uint64 `json:"size"`
+	Page    uint32 `json:"page"`
+	Size    uint32 `json:"size"`
 	HasNext bool   `json:"hasNext"`
 }
 
 type GetInterviewAppointmentsRequest struct {
-	Page  uint64 `query:"page" valid:"type(uint64),optional"`
-	Limit uint64 `query:"limit" valid:"type(uint64),optional"`
+	Page  uint32 `query:"page" valid:"type(uint32),optional"`
+	Limit uint32 `query:"limit" valid:"type(uint32),optional"`
 }
 
 type GetInterviewAppointmentsResponse struct {

@@ -23,7 +23,7 @@ type httpServer struct {
 }
 
 type auth struct {
-	BcryptCost int    `envconfig:"BCRYPT_COST" default:"8"`
+	BcryptCost int    `envconfig:"BCRYPT_COST"`
 	JwtSecret  string `envconfig:"JWT_SECRET"`
 }
 

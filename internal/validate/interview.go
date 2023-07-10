@@ -27,7 +27,7 @@ func (v interviewValidate) ValidateGetInterviewAppointments(ctx *gin.Context) (*
 		if err != nil {
 			return nil, helpers.NewCustomError(http.StatusBadRequest, "Invalid page query parameter")
 		}
-		i := uint64(v)
+		i := uint32(v)
 		req.Page = i
 	}
 	if limit, ok := ctx.GetQuery("limit"); ok {
@@ -35,7 +35,7 @@ func (v interviewValidate) ValidateGetInterviewAppointments(ctx *gin.Context) (*
 		if err != nil {
 			return nil, helpers.NewCustomError(http.StatusBadRequest, "Invalid limit query parameter")
 		}
-		i := uint64(v)
+		i := uint32(v)
 		req.Limit = i
 	}
 	if _, err := govalidator.ValidateStruct(req); err != nil {

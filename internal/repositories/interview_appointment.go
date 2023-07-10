@@ -29,7 +29,7 @@ func NewInterviewAppointmentRepository(mc *mongo.Client, db string) ports.Interv
 	}
 }
 
-func (r *interviewAppointmentRepository) GetAll(ctx context.Context, offset int64, limit int64) ([]domains.InterviewAppointment, error) {
+func (r *interviewAppointmentRepository) GetAll(ctx context.Context, offset uint32, limit uint32) ([]domains.InterviewAppointment, error) {
 	pipeline := []bson.D{
 		{{Key: "$match", Value: bson.D{{Key: "isArchived", Value: false}}}},
 		{{

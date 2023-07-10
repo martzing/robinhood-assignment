@@ -24,7 +24,7 @@ func NewInterviewService(interviewAppointmentRepo ports.InterviewAppointmentRepo
 	}
 }
 
-func (s *interviewService) GetInterviewAppointments(ctx context.Context, offset int64, limit int64) ([]domains.InterviewAppointment, error) {
+func (s *interviewService) GetInterviewAppointments(ctx context.Context, offset uint32, limit uint32) ([]domains.InterviewAppointment, error) {
 	data, err := s.interviewAppointmentRepo.GetAll(ctx, offset, limit)
 	if err != nil {
 		return nil, helpers.NewCustomError(http.StatusInternalServerError, "Cannot get interview appointment.")
