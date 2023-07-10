@@ -76,7 +76,7 @@ var (
 )
 
 func TestGetInterviewAppointments(t *testing.T) {
-	t.Run("Get interview appointments success", func(t *testing.T) {
+	t.Run("get interview appointments success", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		offset := uint32(0)
 		limit := uint32(3)
@@ -86,7 +86,7 @@ func TestGetInterviewAppointments(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, expected, got)
 	})
-	t.Run("Get interview appointments error", func(t *testing.T) {
+	t.Run("get interview appointments error", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		offset := uint32(0)
 		limit := uint32(3)
@@ -99,7 +99,7 @@ func TestGetInterviewAppointments(t *testing.T) {
 }
 
 func TestGetInterviewAppointment(t *testing.T) {
-	t.Run("Get interview appointment success", func(t *testing.T) {
+	t.Run("get interview appointment success", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		id := "64aaf0156999249a602ff55f"
 		objId, _ := primitive.ObjectIDFromHex(id)
@@ -109,7 +109,7 @@ func TestGetInterviewAppointment(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, expected, got)
 	})
-	t.Run("Get interview appointment error when invalid id format", func(t *testing.T) {
+	t.Run("get interview appointment error when invalid id format", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		id := "xxxxx"
 		expected := helpers.InternalError
@@ -117,7 +117,7 @@ func TestGetInterviewAppointment(t *testing.T) {
 		assert.Nil(t, got)
 		assert.Equal(t, expected, err)
 	})
-	t.Run("Get interview appointment error when query error", func(t *testing.T) {
+	t.Run("get interview appointment error when query error", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		id := "64aaf0156999249a602ff55f"
 		objId, _ := primitive.ObjectIDFromHex(id)
@@ -127,7 +127,7 @@ func TestGetInterviewAppointment(t *testing.T) {
 		assert.Nil(t, got)
 		assert.Equal(t, expected, err)
 	})
-	t.Run("Get interview appointment error when data not found", func(t *testing.T) {
+	t.Run("get interview appointment error when data not found", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		id := "64aaf0156999249a602ff55f"
 		objId, _ := primitive.ObjectIDFromHex(id)
@@ -140,7 +140,7 @@ func TestGetInterviewAppointment(t *testing.T) {
 }
 
 func TestCreateInterviewAppointment(t *testing.T) {
-	t.Run("Create interview appointment success", func(t *testing.T) {
+	t.Run("create interview appointment success", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		userId := "6476f457e64589e868aac977"
 		req := &dto.CreateInterviewAppointmentRequest{
@@ -196,7 +196,7 @@ func TestCreateInterviewAppointment(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, expected, got)
 	})
-	t.Run("Create interview appointment error when invalid user id", func(t *testing.T) {
+	t.Run("create interview appointment error when invalid user id", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		userId := "xxxxx"
 		req := &dto.CreateInterviewAppointmentRequest{
@@ -209,7 +209,7 @@ func TestCreateInterviewAppointment(t *testing.T) {
 		assert.Nil(t, got)
 		assert.Equal(t, expected, err)
 	})
-	t.Run("Create interview appointment error when query user fail", func(t *testing.T) {
+	t.Run("create interview appointment error when query user fail", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		userId := "6476f457e64589e868aac977"
 		req := &dto.CreateInterviewAppointmentRequest{
@@ -224,7 +224,7 @@ func TestCreateInterviewAppointment(t *testing.T) {
 		assert.Nil(t, got)
 		assert.Equal(t, expected, err)
 	})
-	t.Run("Create interview appointment error when not exist user", func(t *testing.T) {
+	t.Run("create interview appointment error when not exist user", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		userId := "6476f457e64589e868aac977"
 		req := &dto.CreateInterviewAppointmentRequest{
@@ -239,7 +239,7 @@ func TestCreateInterviewAppointment(t *testing.T) {
 		assert.Nil(t, got)
 		assert.Equal(t, expected, err)
 	})
-	t.Run("Create interview appointment error when query create fail", func(t *testing.T) {
+	t.Run("create interview appointment error when query create fail", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		userId := "6476f457e64589e868aac977"
 		req := &dto.CreateInterviewAppointmentRequest{
@@ -272,7 +272,7 @@ func TestCreateInterviewAppointment(t *testing.T) {
 }
 
 func TestUpdateInterviewAppointment(t *testing.T) {
-	t.Run("Update interview appointment success", func(t *testing.T) {
+	t.Run("update interview appointment success", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		id := "64aaf0156999249a602ff55f"
 		objId, _ := primitive.ObjectIDFromHex(id)
@@ -311,7 +311,7 @@ func TestUpdateInterviewAppointment(t *testing.T) {
 		err := tsvc.service.UpdateInterviewAppointment(ctx, req)
 		assert.NoError(t, err)
 	})
-	t.Run("Update interview appointment error when invalid id format", func(t *testing.T) {
+	t.Run("update interview appointment error when invalid id format", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		id := "xxxxxx"
 		req := &dto.UpdateInterviewAppointmentRequest{
@@ -324,7 +324,7 @@ func TestUpdateInterviewAppointment(t *testing.T) {
 		err := tsvc.service.UpdateInterviewAppointment(ctx, req)
 		assert.Equal(t, expected, err)
 	})
-	t.Run("Update interview appointment error when data not found", func(t *testing.T) {
+	t.Run("update interview appointment error when data not found", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		id := "64aaf0156999249a602ff55f"
 		objId, _ := primitive.ObjectIDFromHex(id)
@@ -345,7 +345,7 @@ func TestUpdateInterviewAppointment(t *testing.T) {
 		err := tsvc.service.UpdateInterviewAppointment(ctx, req)
 		assert.Equal(t, expected, err)
 	})
-	t.Run("Update interview appointment error when update query fail", func(t *testing.T) {
+	t.Run("update interview appointment error when update query fail", func(t *testing.T) {
 		tsvc := newTestInterviewService(t)
 		id := "64aaf0156999249a602ff55f"
 		objId, _ := primitive.ObjectIDFromHex(id)

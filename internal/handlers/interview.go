@@ -201,10 +201,11 @@ func (h *interviewHandler) AddInterviewComment(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, dto.BaseResponse{
+	response := dto.BaseResponse{
 		StatusCode: http.StatusOK,
 		Message:    "success",
-	})
+	}
+	ctx.JSON(http.StatusOK, response)
 }
 
 func (h *interviewHandler) UpdateInterviewComment(ctx *gin.Context) {
