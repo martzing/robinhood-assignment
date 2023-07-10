@@ -1,25 +1,40 @@
 package helpers
 
-import "net/http"
+import (
+	"net/http"
+	"robinhood-assignment/internal/dto"
+)
 
-type CustomError struct {
+type customError struct {
 	StatusCode int
 	Message    string
 }
 
 func NewCustomError(code int, message string) error {
-	return CustomError{
+	return customError{
 		StatusCode: code,
 		Message:    message,
 	}
 }
 
-func (e CustomError) Error() string {
+func (e customError) Error() string {
 	return e.Message
 }
 
-func (e CustomError) Code() int {
+func (e customError) Code() int {
 	return e.StatusCode
+}
+
+func ErrorHandler(err error) *dto.ErrorResponse {
+	errRes := dto.ErrorResponse{}
+	if e, ok := err.(customError); ok {
+		errRes.StatusCode = e.Code()
+		errRes.Error = e.Error()
+		return &errRes
+	}
+	errRes.StatusCode = http.StatusInternalServerError
+	errRes.Error = err.Error()
+	return &errRes
 }
 
 var InternalError = NewCustomError(http.StatusInternalServerError, "Something went wrong please contact developer.")

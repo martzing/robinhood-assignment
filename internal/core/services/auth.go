@@ -29,17 +29,14 @@ func (a *authService) CreateStaff(ctx context.Context, req *dto.CreateStaffReque
 		return helpers.InternalError
 	}
 	if user != nil {
-		return helpers.CustomError{
-			StatusCode: http.StatusConflict,
-			Message:    "Duplicate username",
-		}
+		return helpers.NewCustomError(http.StatusConflict, "Duplicate username")
 	}
 	passHash, err := a.myBcrypt.GenerateFromPassword(req.Password, config.Get().Auth.BcryptCost)
 	if err != nil {
 		return helpers.InternalError
 	}
 
-	createUserPatams := &domains.CreateUserParams{
+	params := &domains.CreateUserParams{
 		Name:     req.Name,
 		Email:    req.Email,
 		Username: req.Username,
@@ -47,31 +44,22 @@ func (a *authService) CreateStaff(ctx context.Context, req *dto.CreateStaffReque
 		ImageUrl: req.ImageUrl,
 		Role:     req.Role,
 	}
-	if _, err := a.userRepo.Create(ctx, createUserPatams); err != nil {
-		return helpers.CustomError{
-			StatusCode: http.StatusConflict,
-			Message:    "Create staff fail.",
-		}
+	if _, err := a.userRepo.Create(ctx, params); err != nil {
+		return helpers.NewCustomError(http.StatusConflict, "Create staff fail")
 	}
 	return nil
 }
 
-func (a *authService) Login(ctx context.Context, params *dto.LoginRequest) (string, error) {
-	user, err := a.userRepo.GetByUsername(ctx, params.Username)
+func (a *authService) Login(ctx context.Context, req *dto.LoginRequest) (string, error) {
+	user, err := a.userRepo.GetByUsername(ctx, req.Username)
 	if err != nil {
 		return "", helpers.InternalError
 	}
 	if user == nil {
-		return "", helpers.CustomError{
-			StatusCode: http.StatusNotFound,
-			Message:    "Username not found",
-		}
+		return "", helpers.NewCustomError(http.StatusNotFound, "Username not found")
 	}
-	if err := a.myBcrypt.CompareHashAndPassword(user.Password, params.Password); err != nil {
-		return "", helpers.CustomError{
-			StatusCode: http.StatusUnauthorized,
-			Message:    "Password is incorrect",
-		}
+	if err := a.myBcrypt.CompareHashAndPassword(user.Password, req.Password); err != nil {
+		return "", helpers.NewCustomError(http.StatusNotFound, "Password is incorrect")
 	}
 	token := a.myJWT.NewWithClaims(jwt.SigningMethodHS256, domains.Claims{
 		UserID: user.ID.Hex(),

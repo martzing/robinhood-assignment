@@ -7,8 +7,8 @@ import (
 )
 
 type AuthServie interface {
-	CreateStaff(ctx context.Context, params *dto.CreateStaffRequest) error
-	Login(ctx context.Context, params *dto.LoginRequest) (string, error)
+	CreateStaff(ctx context.Context, req *dto.CreateStaffRequest) error
+	Login(ctx context.Context, req *dto.LoginRequest) (string, error)
 }
 
 type InterviewService interface {
