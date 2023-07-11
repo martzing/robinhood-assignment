@@ -218,7 +218,7 @@ func TestLogin(t *testing.T) {
 			Password: password,
 		}
 		expectedRes := ""
-		expectedErr := helpers.NewCustomError(http.StatusNotFound, "Password is incorrect")
+		expectedErr := helpers.NewCustomError(http.StatusUnauthorized, "Password is incorrect")
 
 		tsvc.userRepo.On("GetByUsername", ctx, username).Return(&user, nil)
 		tsvc.myBcrypt.On("CompareHashAndPassword", user.Password, password).Return(errors.New("some error"))
