@@ -3,7 +3,7 @@
 ## Run apllication
 
 - Make sure your machine was installed with Docker.
-- Build docker image and start application container wirh command ```docker compose up```
+- Build docker image and start application container with command ```docker compose up```
 - Now application and database is running.
 
 ## Initail database
