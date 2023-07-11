@@ -1,0 +1,11 @@
+[{
+  "_id": {
+    "$oid": "64ac6cb9b0a3e8792efc438e"
+  },
+  "name": "demo",
+  "email": "demo@gmail.com",
+  "username": "demo",
+  "password": "$2a$08$2U7tjsBbxuGsVjCknMMGzOEGxqt.zvwTW3uj/zhhKsFZhYsw6kzOm",
+  "imageUrl": "https://unsplash.com/s/photos/image",
+  "role": "ADMIN"
+}]
