@@ -12,6 +12,7 @@ import (
 	"robinhood-assignment/internal/validate"
 	"testing"
 
+	"github.com/asaskevich/govalidator"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
@@ -27,6 +28,7 @@ func newTestInterviewValidate(t *testing.T) testInterviewValidate {
 
 func TestValidateGetInterviewAppointments(t *testing.T) {
 	gin.SetMode(gin.TestMode)
+	govalidator.SetFieldsRequiredByDefault(true)
 	page := uint32(1)
 	limit := uint32(10)
 	t.Run("validate get interview appointments success", func(t *testing.T) {
@@ -68,6 +70,7 @@ func TestValidateGetInterviewAppointments(t *testing.T) {
 
 func TestValidateGetInterviewAppointment(t *testing.T) {
 	gin.SetMode(gin.TestMode)
+	govalidator.SetFieldsRequiredByDefault(true)
 	t.Run("validate get interview appointment success", func(t *testing.T) {
 		id := "6476f457e64589e868aac97b"
 		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
@@ -103,6 +106,7 @@ func TestValidateGetInterviewAppointment(t *testing.T) {
 
 func TestValidateCreateInterviewAppointment(t *testing.T) {
 	gin.SetMode(gin.TestMode)
+	govalidator.SetFieldsRequiredByDefault(true)
 	type requestBody struct {
 		Title       string
 		Description string
@@ -140,7 +144,7 @@ func TestValidateCreateInterviewAppointment(t *testing.T) {
 
 		tvalid := newTestInterviewValidate(t)
 		got, err := tvalid.interviewValidate.ValidateCreateInterviewAppointment(ctx)
-		expected := helpers.NewCustomError(http.StatusBadRequest, "title and description cannot empty")
+		expected := helpers.NewCustomError(http.StatusBadRequest, "title: Missing required field")
 		assert.Nil(t, got)
 		assert.Equal(t, expected, err)
 	})
@@ -156,7 +160,7 @@ func TestValidateCreateInterviewAppointment(t *testing.T) {
 
 		tvalid := newTestInterviewValidate(t)
 		got, err := tvalid.interviewValidate.ValidateCreateInterviewAppointment(ctx)
-		expected := helpers.NewCustomError(http.StatusBadRequest, "title and description cannot empty")
+		expected := helpers.NewCustomError(http.StatusBadRequest, "description: Missing required field")
 		assert.Nil(t, got)
 		assert.Equal(t, expected, err)
 	})
@@ -164,6 +168,7 @@ func TestValidateCreateInterviewAppointment(t *testing.T) {
 
 func TestValidateUpdateInterviewAppointment(t *testing.T) {
 	gin.SetMode(gin.TestMode)
+	govalidator.SetFieldsRequiredByDefault(true)
 	type requestBody struct {
 		ID          string
 		Title       string
@@ -221,6 +226,236 @@ func TestValidateUpdateInterviewAppointment(t *testing.T) {
 		tvalid := newTestInterviewValidate(t)
 		got, err := tvalid.interviewValidate.ValidateUpdateInterviewAppointment(ctx)
 		expected := helpers.NewCustomError(http.StatusBadRequest, "id in body must be of type bsonobjectid: \"xxxxx\"")
+		assert.Nil(t, got)
+		assert.Equal(t, expected, err)
+	})
+}
+
+func TestValidateArchiveInterviewAppointment(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	govalidator.SetFieldsRequiredByDefault(true)
+	t.Run("validate archive interview appointment success", func(t *testing.T) {
+		id := "6476f457e64589e868aac97b"
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		ctx.Params = []gin.Param{
+			{Key: "id", Value: id},
+		}
+
+		tvalid := newTestInterviewValidate(t)
+		got, err := tvalid.interviewValidate.ValidateArchiveInterviewAppointment(ctx)
+		expected := id
+		assert.NoError(t, err)
+		assert.Equal(t, expected, got)
+	})
+	t.Run("validate archive interview appointment error when id is missing", func(t *testing.T) {
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		tvalid := newTestInterviewValidate(t)
+		got, err := tvalid.interviewValidate.ValidateArchiveInterviewAppointment(ctx)
+		expected := helpers.NewCustomError(http.StatusBadRequest, "id: Missing required field")
+		assert.Equal(t, "", got)
+		assert.Equal(t, expected, err)
+	})
+	t.Run("validate archive interview appointment error when id is invalid format", func(t *testing.T) {
+		id := "xxxxxxx"
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		ctx.Params = []gin.Param{
+			{Key: "id", Value: id},
+		}
+
+		tvalid := newTestInterviewValidate(t)
+		got, err := tvalid.interviewValidate.ValidateArchiveInterviewAppointment(ctx)
+		expected := helpers.NewCustomError(http.StatusBadRequest, "id in param must be of type bsonobjectid: \"xxxxxxx\"")
+		assert.Equal(t, "", got)
+		assert.Equal(t, expected, err)
+	})
+}
+
+func TestValidateAddInterviewComment(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	govalidator.SetFieldsRequiredByDefault(true)
+	type requestBody struct {
+		Comment string
+	}
+	t.Run("validate add interview comment success", func(t *testing.T) {
+		id := "6476f457e64589e868aac97b"
+		userId := "64ac6cb9b0a3e8792efc438e"
+		body := requestBody{Comment: "comment"}
+		var buf bytes.Buffer
+		json.NewEncoder(&buf).Encode(body)
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		ctx.Params = []gin.Param{
+			{Key: "id", Value: id},
+		}
+		ctx.Request, _ = http.NewRequest("POST", "http://example.com", &buf)
+		ctx.Set("userId", userId)
+		tvalid := newTestInterviewValidate(t)
+		got, err := tvalid.interviewValidate.ValidateAddInterviewComment(ctx)
+		expected := &dto.AddInterviewCommentRequest{
+			ID:      id,
+			Comment: body.Comment,
+			UserID:  userId,
+		}
+		assert.NoError(t, err)
+		assert.Equal(t, expected, got)
+	})
+	t.Run("validate add interview comment error when id is missing", func(t *testing.T) {
+		userId := "64ac6cb9b0a3e8792efc438e"
+		body := requestBody{Comment: "comment"}
+		var buf bytes.Buffer
+		json.NewEncoder(&buf).Encode(body)
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		ctx.Request, _ = http.NewRequest("POST", "http://example.com", &buf)
+		ctx.Set("userId", userId)
+		tvalid := newTestInterviewValidate(t)
+		got, err := tvalid.interviewValidate.ValidateAddInterviewComment(ctx)
+		expected := helpers.NewCustomError(http.StatusBadRequest, "id: Missing required field")
+		assert.Nil(t, got)
+		assert.Equal(t, expected, err)
+	})
+	t.Run("validate add interview comment error when comment is missing", func(t *testing.T) {
+		id := "6476f457e64589e868aac97b"
+		userId := "64ac6cb9b0a3e8792efc438e"
+		body := requestBody{}
+		var buf bytes.Buffer
+		json.NewEncoder(&buf).Encode(body)
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		ctx.Params = []gin.Param{
+			{Key: "id", Value: id},
+		}
+		ctx.Request, _ = http.NewRequest("POST", "http://example.com", &buf)
+		ctx.Set("userId", userId)
+		tvalid := newTestInterviewValidate(t)
+		got, err := tvalid.interviewValidate.ValidateAddInterviewComment(ctx)
+		expected := helpers.NewCustomError(http.StatusBadRequest, "comment: Missing required field")
+		assert.Nil(t, got)
+		assert.Equal(t, expected, err)
+	})
+}
+
+func TestValidateUpdateInterviewComment(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	govalidator.SetFieldsRequiredByDefault(true)
+	type requestBody struct {
+		Comment string
+	}
+	t.Run("validate update interview comment success", func(t *testing.T) {
+		id := "6476f457e64589e868aac97b"
+		commentId := "64ace6bd981e163c387f494e"
+		userId := "64ac6cb9b0a3e8792efc438e"
+		body := requestBody{Comment: "update comment"}
+		var buf bytes.Buffer
+		json.NewEncoder(&buf).Encode(body)
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		ctx.Params = []gin.Param{
+			{Key: "id", Value: id},
+			{Key: "commentId", Value: commentId},
+		}
+		ctx.Request, _ = http.NewRequest("POST", "http://example.com", &buf)
+		ctx.Set("userId", userId)
+		tvalid := newTestInterviewValidate(t)
+		got, err := tvalid.interviewValidate.ValidateUpdateInterviewComment(ctx)
+		expected := &dto.UpdateInterviewCommentRequest{
+			ID:        id,
+			CommentID: commentId,
+			Comment:   body.Comment,
+			UserID:    userId,
+		}
+		assert.NoError(t, err)
+		assert.Equal(t, expected, got)
+	})
+	t.Run("validate update interview comment error when id is missing", func(t *testing.T) {
+		commentId := "64ace6bd981e163c387f494e"
+		userId := "64ac6cb9b0a3e8792efc438e"
+		body := requestBody{Comment: "update comment"}
+		var buf bytes.Buffer
+		json.NewEncoder(&buf).Encode(body)
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		ctx.Params = []gin.Param{
+			{Key: "commentId", Value: commentId},
+		}
+		ctx.Request, _ = http.NewRequest("POST", "http://example.com", &buf)
+		ctx.Set("userId", userId)
+		tvalid := newTestInterviewValidate(t)
+		got, err := tvalid.interviewValidate.ValidateUpdateInterviewComment(ctx)
+		expected := helpers.NewCustomError(http.StatusBadRequest, "id: Missing required field")
+		assert.Nil(t, got)
+		assert.Equal(t, expected, err)
+	})
+	t.Run("validate update interview comment error when comment id is missing", func(t *testing.T) {
+		id := "6476f457e64589e868aac97b"
+		userId := "64ac6cb9b0a3e8792efc438e"
+		body := requestBody{Comment: "update comment"}
+		var buf bytes.Buffer
+		json.NewEncoder(&buf).Encode(body)
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		ctx.Params = []gin.Param{
+			{Key: "id", Value: id},
+		}
+		ctx.Request, _ = http.NewRequest("POST", "http://example.com", &buf)
+		ctx.Set("userId", userId)
+		tvalid := newTestInterviewValidate(t)
+		got, err := tvalid.interviewValidate.ValidateUpdateInterviewComment(ctx)
+		expected := helpers.NewCustomError(http.StatusBadRequest, "commentId: Missing required field")
+		assert.Nil(t, got)
+		assert.Equal(t, expected, err)
+	})
+	t.Run("validate update interview comment error when comment is missing", func(t *testing.T) {
+		id := "6476f457e64589e868aac97b"
+		commentId := "64ace6bd981e163c387f494e"
+		userId := "64ac6cb9b0a3e8792efc438e"
+		body := requestBody{}
+		var buf bytes.Buffer
+		json.NewEncoder(&buf).Encode(body)
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		ctx.Params = []gin.Param{
+			{Key: "id", Value: id},
+			{Key: "commentId", Value: commentId},
+		}
+		ctx.Request, _ = http.NewRequest("POST", "http://example.com", &buf)
+		ctx.Set("userId", userId)
+		tvalid := newTestInterviewValidate(t)
+		got, err := tvalid.interviewValidate.ValidateUpdateInterviewComment(ctx)
+		expected := helpers.NewCustomError(http.StatusBadRequest, "comment: Missing required field")
+		assert.Nil(t, got)
+		assert.Equal(t, expected, err)
+	})
+	t.Run("validate update interview comment error when id is invalid format", func(t *testing.T) {
+		id := "xxxxxxx"
+		commentId := "64ace6bd981e163c387f494e"
+		userId := "64ac6cb9b0a3e8792efc438e"
+		body := requestBody{Comment: "update comment"}
+		var buf bytes.Buffer
+		json.NewEncoder(&buf).Encode(body)
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		ctx.Params = []gin.Param{
+			{Key: "id", Value: id},
+			{Key: "commentId", Value: commentId},
+		}
+		ctx.Request, _ = http.NewRequest("POST", "http://example.com", &buf)
+		ctx.Set("userId", userId)
+		tvalid := newTestInterviewValidate(t)
+		got, err := tvalid.interviewValidate.ValidateUpdateInterviewComment(ctx)
+		expected := helpers.NewCustomError(http.StatusBadRequest, "id in param must be of type bsonobjectid: \"xxxxxxx\"")
+		assert.Nil(t, got)
+		assert.Equal(t, expected, err)
+	})
+	t.Run("validate update interview comment error when comment id is invalid format", func(t *testing.T) {
+		id := "6476f457e64589e868aac97b"
+		commentId := "xxxxxxx"
+		userId := "64ac6cb9b0a3e8792efc438e"
+		body := requestBody{Comment: "update comment"}
+		var buf bytes.Buffer
+		json.NewEncoder(&buf).Encode(body)
+		ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
+		ctx.Params = []gin.Param{
+			{Key: "id", Value: id},
+			{Key: "commentId", Value: commentId},
+		}
+		ctx.Request, _ = http.NewRequest("POST", "http://example.com", &buf)
+		ctx.Set("userId", userId)
+		tvalid := newTestInterviewValidate(t)
+		got, err := tvalid.interviewValidate.ValidateUpdateInterviewComment(ctx)
+		expected := helpers.NewCustomError(http.StatusBadRequest, "commentId in param must be of type bsonobjectid: \"xxxxxxx\"")
 		assert.Nil(t, got)
 		assert.Equal(t, expected, err)
 	})
