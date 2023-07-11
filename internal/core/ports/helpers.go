@@ -13,5 +13,6 @@ type MyBcrypt interface {
 
 type MyJWT interface {
 	NewWithClaims(method jwt.SigningMethod, claims domains.Claims, opts ...jwt.TokenOption) *jwt.Token
-	ParseWithClaims(tokenString string, claims jwt.Claims, keyFunc jwt.Keyfunc, opts ...jwt.ParserOption) (*jwt.Token, error)
+	ParseWithClaims(tokenString string, claims *domains.Claims, keyFunc jwt.Keyfunc, opts ...jwt.ParserOption) (*jwt.Token, error)
+	ParseToken(token *jwt.Token) (interface{}, error)
 }

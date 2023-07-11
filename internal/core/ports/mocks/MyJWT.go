@@ -38,8 +38,34 @@ func (_m *MyJWT) NewWithClaims(method jwt.SigningMethod, claims domains.Claims, 
 	return r0
 }
 
+// ParseToken provides a mock function with given fields: token
+func (_m *MyJWT) ParseToken(token *jwt.Token) (interface{}, error) {
+	ret := _m.Called(token)
+
+	var r0 interface{}
+	var r1 error
+	if rf, ok := ret.Get(0).(func(*jwt.Token) (interface{}, error)); ok {
+		return rf(token)
+	}
+	if rf, ok := ret.Get(0).(func(*jwt.Token) interface{}); ok {
+		r0 = rf(token)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(interface{})
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(*jwt.Token) error); ok {
+		r1 = rf(token)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ParseWithClaims provides a mock function with given fields: tokenString, claims, keyFunc, opts
-func (_m *MyJWT) ParseWithClaims(tokenString string, claims jwt.Claims, keyFunc jwt.Keyfunc, opts ...jwt.ParserOption) (*jwt.Token, error) {
+func (_m *MyJWT) ParseWithClaims(tokenString string, claims *domains.Claims, keyFunc jwt.Keyfunc, opts ...jwt.ParserOption) (*jwt.Token, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]
@@ -51,10 +77,10 @@ func (_m *MyJWT) ParseWithClaims(tokenString string, claims jwt.Claims, keyFunc 
 
 	var r0 *jwt.Token
 	var r1 error
-	if rf, ok := ret.Get(0).(func(string, jwt.Claims, jwt.Keyfunc, ...jwt.ParserOption) (*jwt.Token, error)); ok {
+	if rf, ok := ret.Get(0).(func(string, *domains.Claims, jwt.Keyfunc, ...jwt.ParserOption) (*jwt.Token, error)); ok {
 		return rf(tokenString, claims, keyFunc, opts...)
 	}
-	if rf, ok := ret.Get(0).(func(string, jwt.Claims, jwt.Keyfunc, ...jwt.ParserOption) *jwt.Token); ok {
+	if rf, ok := ret.Get(0).(func(string, *domains.Claims, jwt.Keyfunc, ...jwt.ParserOption) *jwt.Token); ok {
 		r0 = rf(tokenString, claims, keyFunc, opts...)
 	} else {
 		if ret.Get(0) != nil {
@@ -62,7 +88,7 @@ func (_m *MyJWT) ParseWithClaims(tokenString string, claims jwt.Claims, keyFunc 
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(string, jwt.Claims, jwt.Keyfunc, ...jwt.ParserOption) error); ok {
+	if rf, ok := ret.Get(1).(func(string, *domains.Claims, jwt.Keyfunc, ...jwt.ParserOption) error); ok {
 		r1 = rf(tokenString, claims, keyFunc, opts...)
 	} else {
 		r1 = ret.Error(1)

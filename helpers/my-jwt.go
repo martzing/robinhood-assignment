@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"robinhood-assignment/config"
 	"robinhood-assignment/internal/core/domains"
 	"robinhood-assignment/internal/core/ports"
 
@@ -19,7 +20,11 @@ func (j myJWT) NewWithClaims(method jwt.SigningMethod, claims domains.Claims, op
 	return token
 }
 
-func (j myJWT) ParseWithClaims(tokenString string, claims jwt.Claims, keyFunc jwt.Keyfunc, opts ...jwt.ParserOption) (*jwt.Token, error) {
+func (j myJWT) ParseWithClaims(tokenString string, claims *domains.Claims, keyFunc jwt.Keyfunc, opts ...jwt.ParserOption) (*jwt.Token, error) {
 	token, err := jwt.ParseWithClaims(tokenString, claims, keyFunc, opts...)
 	return token, err
+}
+
+func (j myJWT) ParseToken(token *jwt.Token) (interface{}, error) {
+	return []byte(config.Get().Auth.JwtSecret), nil
 }

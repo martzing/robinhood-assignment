@@ -14,13 +14,13 @@ type AuthServie struct {
 	mock.Mock
 }
 
-// CreateStaff provides a mock function with given fields: ctx, params
-func (_m *AuthServie) CreateStaff(ctx context.Context, params *dto.CreateStaffRequest) error {
-	ret := _m.Called(ctx, params)
+// CreateStaff provides a mock function with given fields: ctx, req
+func (_m *AuthServie) CreateStaff(ctx context.Context, req *dto.CreateStaffRequest) error {
+	ret := _m.Called(ctx, req)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, *dto.CreateStaffRequest) error); ok {
-		r0 = rf(ctx, params)
+		r0 = rf(ctx, req)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -28,23 +28,23 @@ func (_m *AuthServie) CreateStaff(ctx context.Context, params *dto.CreateStaffRe
 	return r0
 }
 
-// Login provides a mock function with given fields: ctx, params
-func (_m *AuthServie) Login(ctx context.Context, params *dto.LoginRequest) (string, error) {
-	ret := _m.Called(ctx, params)
+// Login provides a mock function with given fields: ctx, req
+func (_m *AuthServie) Login(ctx context.Context, req *dto.LoginRequest) (string, error) {
+	ret := _m.Called(ctx, req)
 
 	var r0 string
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, *dto.LoginRequest) (string, error)); ok {
-		return rf(ctx, params)
+		return rf(ctx, req)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, *dto.LoginRequest) string); ok {
-		r0 = rf(ctx, params)
+		r0 = rf(ctx, req)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, *dto.LoginRequest) error); ok {
-		r1 = rf(ctx, params)
+		r1 = rf(ctx, req)
 	} else {
 		r1 = ret.Error(1)
 	}

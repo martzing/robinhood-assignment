@@ -40,9 +40,7 @@ func (m middlewares) AdminMiddleware(ctx *gin.Context) {
 	}
 	tokenString := jwtToken[1]
 	claims := &domains.Claims{}
-	if _, err := m.myJWT.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(config.Get().Auth.JwtSecret), nil
-	}); err != nil {
+	if _, err := m.myJWT.ParseWithClaims(tokenString, claims, m.myJWT.ParseToken); err != nil {
 		ctx.AbortWithStatusJSON(http.StatusUnauthorized, dto.ErrorResponse{
 			StatusCode: http.StatusUnauthorized,
 			Error:      err.Error(),

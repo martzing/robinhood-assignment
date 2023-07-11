@@ -70,8 +70,7 @@ func main() {
 
 	authGroup := r.Group("/api/auth")
 	authGroup.POST("/login", authHandler.Login)
-	// authGroup.POST("/staff", middleware.AdminMiddleware, authHandler.CreateStaff)
-	authGroup.POST("/staff", authHandler.CreateStaff)
+	authGroup.POST("/staff", middleware.AdminMiddleware, authHandler.CreateStaff)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", config.Get().HTTPServer.Port),
