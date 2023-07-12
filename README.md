@@ -1,6 +1,6 @@
 # robinhood-assignment
 
-## Run apllication
+## Run application
 
 - Make sure your machine was installed with Docker.
 - Build docker image and start application container with command ```docker compose up```
